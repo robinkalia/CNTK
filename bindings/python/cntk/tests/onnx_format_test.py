@@ -6,6 +6,7 @@
 import os
 import numpy as np
 import cntk as C
+from cntk.ops.tests.ops_test_utils import cntk_device
 import pytest
 
 def test_load_save_constant(tmpdir):
@@ -73,10 +74,14 @@ def test_convolution(tmpdir, auto_padding):
     x_ = loaded_node.arguments[0]
     assert np.allclose(loaded_node.eval({x_:[img]}), root_node.eval({x:[img]}))
 
-DType_Config = (np.float32, np.float16)    
+DType_Config = (np.float32, np.float16)
 @pytest.mark.parametrize("dtype", DType_Config)
-def test_convolution_transpose(tmpdir, dtype):
-    with C.default_options(dtype = dtype):
+def test_convolution_transpose(tmpdir, dtype, device_id):
+    if device_id == -1 and dtype == np.float16:
+        pytest.skip('Test only runs on GPU')
+
+    device = cntk_device(device_id)
+    with C.default_options(dtype=dtype, device=device):
         img_shape = (1, 3, 3)
         img = np.asarray(np.random.uniform(-1, 1, img_shape), dtype=dtype)
 
