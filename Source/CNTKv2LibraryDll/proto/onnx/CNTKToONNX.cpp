@@ -1151,7 +1151,7 @@ std::vector<int64_t> CNTKToONNXHelper::ToINTS(const std::vector<Axis>& axes)
 
 bool IsUnSupportedLayerNormalization(const FunctionPtr src)
 {
-    std::string cntkOpName = ToString(src->OpName());
+    std::string cntkOpName = ToLegacyString(ToUTF8(src->OpName()));
     return cntkOpName == "LayerNormalization" && src->Output().HasSequenceAxis();
 }
 
@@ -1223,7 +1223,7 @@ std::string CNTKToONNXHelper::ToOPName(const FunctionPtr& src)
     auto lookup = Operators::CntkToONNXLookup();
     assert(lookup.count(src->OpName()) != 0);
 
-    std::string opName = ToString(src->OpName());
+    std::string opName = ToLegacyString(ToUTF8(src->OpName()));
     if (lookup.count(src->OpName()) == 1)
     {
         auto attributesMap = lookup.find(src->OpName())->second.map;
@@ -1509,7 +1509,7 @@ void CNTKToONNXHelper::PrepareRNNInput(const Variable &X, Graph *graph, std::vec
     Variable input;
     wstring opName = X.Owner() ? X.Owner()->OpName() : L"";
     
-    if (X.BlockFunctionVariableMapping().IsInitialized() && !Operators::IsRNNOp(ToString(opName)) && opName != L"Embedding")
+    if (X.BlockFunctionVariableMapping().IsInitialized() && !Operators::IsRNNOp(ToLegacyString(ToUTF8(opName))) && opName != L"Embedding")
     {
         // Embedding block output name is the block name already so we shall not mape ro the root function argument.
         input = X.BlockFunctionVariableMapping();
@@ -1519,7 +1519,7 @@ void CNTKToONNXHelper::PrepareRNNInput(const Variable &X, Graph *graph, std::vec
         input = X;
     }
 
-    std::string inputName = ToString(input.Uid());
+    std::string inputName = ToLegacyString(ToUTF8(input.Uid()));
     onnx::TypeProto inputArgType = ToTypeProto(input.Shape(), (int)(input.DynamicAxes().size()));
 
     if (input.IsInput() && input.HasSequenceAxis())
@@ -1716,9 +1716,9 @@ std::pair<string, string> MakeRNNAndPostReshapeOutputNames(const std::vector<Fun
 {
     std::string nodeOutputName;
     if (lstms.size() == 1)
-        nodeOutputName = ToString(Yhs[0].Uid());
+        nodeOutputName = ToLegacyString(ToUTF8(Yhs[0].Uid()));
     else
-        nodeOutputName = ToString(src->Output().Uid());
+        nodeOutputName = ToLegacyString(ToUTF8(src->Output().Uid()));
     std::string nodeOutputNameBeforeReshape = nodeOutputName + "_before_reshape";
     return std::make_pair(nodeOutputName, nodeOutputNameBeforeReshape);
 }
@@ -1868,7 +1868,7 @@ LotusIR::Node* CNTKToONNXHelper::CreateLSTMNode(const FunctionPtr &src,
         bool has_initial_h = std::all_of(initialHs.begin(), initialHs.end(), [](Variable &v) {return v.IsInitialized(); });
         if (has_initial_h)
         {
-            std::string hiddenUid = ToString(Yhs[0].Uid()) + "_initial_h";
+            std::string hiddenUid = ToLegacyString(ToUTF8(Yhs[0].Uid())) + "_initial_h";
             PrepareLSTMInitialStateNode(graph, variableNodes, initialHs, FreeBatchSize, hidden_size, hiddenUid, nodeInputs);
         }
         else
@@ -1879,7 +1879,7 @@ LotusIR::Node* CNTKToONNXHelper::CreateLSTMNode(const FunctionPtr &src,
         bool has_initial_c = std::all_of(initialCs.begin(), initialCs.end(), [](Variable &v) {return v.IsInitialized(); });
         if (has_initial_c)
         {
-            std::string cellUid = ToString(Ycs[0].Uid()) + "_initial_c";
+            std::string cellUid = ToLegacyString(ToUTF8(Ycs[0].Uid())) + "_initial_c";
             PrepareLSTMInitialStateNode(graph, variableNodes, initialCs, FreeBatchSize, hidden_size, cellUid, nodeInputs);
         }
         else
@@ -2150,7 +2150,7 @@ LotusIR::Node *CNTKToONNXHelper::CreateGRUNode(const FunctionPtr &src,
         bool has_initial_h = std::all_of(initialHs.begin(), initialHs.end(), [](Variable &v) {return v.IsInitialized(); });
         if (has_initial_h)
         {
-            std::string hiddenUid = ToString(Yhs[0].Uid()) + "_initial_h";
+            std::string hiddenUid = ToLegacyString(ToUTF8(Yhs[0].Uid())) + "_initial_h";
             PrepareLSTMInitialStateNode(graph, variableNodes, initialHs, FreeBatchSize, hidden_size, hiddenUid, nodeInputs);
         }
         else
@@ -2171,7 +2171,7 @@ LotusIR::Node *CNTKToONNXHelper::CreateGRUNode(const FunctionPtr &src,
 
         {
             Variable Yh = Yhs[0];
-            std::string nodeName = ToString(Yh.Uid()) + "_h";
+            std::string nodeName = ToLegacyString(ToUTF8(Yh.Uid())) + "_h";
             // TODO: batchSize is fixed to one. Needs to find out how to handle bacth axis as a free dimension.
             const int batchSize = 1;
             const bool doReverseVec = false;
@@ -2350,7 +2350,7 @@ LotusIR::Node *CNTKToONNXHelper::CreateRNNNode(const FunctionPtr &src,
         bool has_initial_h = std::all_of(initialHs.begin(), initialHs.end(), [](Variable &v) {return v.IsInitialized(); });
         if (has_initial_h)
         {
-            std::string hiddenUid = ToString(Yhs[0].Uid()) + "_initial_h";
+            std::string hiddenUid = ToLegacyString(ToUTF8(Yhs[0].Uid())) + "_initial_h";
             PrepareLSTMInitialStateNode(graph, variableNodes, initialHs, FreeBatchSize, hidden_size, hiddenUid, nodeInputs);
         }
         else
@@ -2471,13 +2471,13 @@ LotusIR::Node *CNTKToONNXHelper::InsertReshapeNodeToCNTKFunction(const FunctionP
 {
     FunctionPtr blockRoot = src->BlockRoot();
     Variable output;
-    if (Operators::IsRNNOp(ToString(src->OpName())))
+    if (Operators::IsRNNOp(ToLegacyString(ToUTF8(src->OpName()))))
         output = src->Outputs()[0];
     else
         // a bidirection LSTM case
         NOT_IMPLEMENTED
 
-    std::string nodeName = ToString(blockRoot->Uid());
+    std::string nodeName = ToLegacyString(ToUTF8(blockRoot->Uid()));
 
     // We need to name reshape node's output arg with LSTM output name.
     // Thus we need to give LSTM node output a different name.
@@ -2602,7 +2602,7 @@ void CNTKToONNXHelper::ProcessInputs(const FunctionPtr& src,
     const std::unordered_map<Variable, Variable>& compositeOutputsMap,
     std::vector<LotusIR::NodeArg *>& inputs)
 {
-    std::string cntkOpName = ToString(src->OpName());
+    std::string cntkOpName = ToLegacyString(ToUTF8(src->OpName()));
     std::string onnxOpName = ToOPName(src);
 
     for (size_t inputIndex = 0; inputIndex < src->Inputs().size(); ++inputIndex)
@@ -2619,7 +2619,7 @@ void CNTKToONNXHelper::ProcessInputs(const FunctionPtr& src,
         // Special case handling of LayerNormalization layer because it changes
         // ops dynamically based on value of inputs. If more such cases ops are seen,
         // this should be abstracted out from here.
-        if (ToString(src->OpName()) == "LayerNormalization")
+        if (ToLegacyString(ToUTF8(src->OpName())) == "LayerNormalization")
         {
             // If non-zero epsilon was specified, a fourth input is included
             // which must be ignored because we cannot export epsilon to ONNX.
@@ -2634,10 +2634,10 @@ void CNTKToONNXHelper::ProcessInputs(const FunctionPtr& src,
         //
         // Use user-defined name if available, otherwise use our internal unique name ID.
         //
-        std::string inputName = ToString(input.Uid());
+        std::string inputName = ToLegacyString(ToUTF8(input.Uid()));
         auto inputItr = compositeOutputsMap.find(input);
         if (inputItr != compositeOutputsMap.end())
-            inputName = ToString(inputItr->second.Uid());
+            inputName = ToLegacyString(ToUTF8(inputItr->second.Uid()));
 
         bool isConstant = (input.IsParameter() || input.IsConstant()) &&
             !Operators::IgnoreConstantAndParameter(src->OpName(), inputIndex);
@@ -2800,7 +2800,7 @@ void CNTKToONNXHelper::TraverseGraph(const FunctionPtr& src,
     if (iter != visited.end())
         return;
 
-    std::string opName = ToString(src->OpName());
+    std::string opName = ToLegacyString(ToUTF8(src->OpName()));
     if (Operators::IsLoopOp(opName))
     {
         // avoid infinite loop
@@ -2840,7 +2840,7 @@ void CNTKToONNXHelper::CopyAttributes(const FunctionPtr& src, LotusIR::Node* nod
     auto lookup = Operators::CntkToONNXLookup();
     assert(lookup.count(src->OpName()) != 0);
 
-    std::string opName = ToString(src->OpName());
+    std::string opName = ToLegacyString(ToUTF8(src->OpName()));
     if (lookup.count(src->OpName()) == 1)
     {
         auto attributesMap = lookup.find(src->OpName())->second.map;
@@ -3737,10 +3737,10 @@ LotusIR::Node* CNTKToONNXHelper::CreateONNXNodesForOptimizedRNNStack(const Funct
     UpdateONNXType(ornnOutput.GetDataType(), ornnOutputArgType);
 
     // Note: Keep the ONNX node input name same as the CNTK node as done below.
-    std::string ornnInputName = ToString(ornnInput.Uid());
+    std::string ornnInputName = ToLegacyString(ToUTF8(ornnInput.Uid()));
     auto inputItr = compositeOutputsMap.find(ornnInput);
     if (inputItr != compositeOutputsMap.end())
-        ornnInputName = ToString(inputItr->second.Uid());
+        ornnInputName = ToLegacyString(ToUTF8(inputItr->second.Uid()));
 
     // Create ONNX LSTM layers
     LotusIR::NodeArg *layerInputOperandArg = &graph->GetOrCreateNodeArg(ornnInputName, &ornnInputArgType);
@@ -3762,13 +3762,13 @@ LotusIR::Node* CNTKToONNXHelper::CreateONNXNodesForOptimizedRNNStack(const Funct
             inputs.push_back(layerInputOperandArg);
 
         // Create node for input weight tensor W
-        auto WArgName = ToString(Wcombined.Uid()) + "_W_" + std::to_string(i);
+        auto WArgName = ToLegacyString(ToUTF8(Wcombined.Uid())) + "_W_" + std::to_string(i);
         CreateRecurrentWeightONNXNodes(graph, variableNodes, Wcombined, inputs, W[i], WArgName);
         // Create node for input weight tensor R (equivalent to CNTK's H)
-        auto RArgName = ToString(Wcombined.Uid()) + "_R_" + std::to_string(i);
+        auto RArgName = ToLegacyString(ToUTF8(Wcombined.Uid())) + "_R_" + std::to_string(i);
         CreateRecurrentWeightONNXNodes(graph, variableNodes, Wcombined, inputs, R[i], RArgName);
         // Create node for input bias tensor B
-        auto BArgName = ToString(Wcombined.Uid()) + "_B_" + std::to_string(i);
+        auto BArgName = ToLegacyString(ToUTF8(Wcombined.Uid())) + "_B_" + std::to_string(i);
         CreateRecurrentWeightONNXNodes(graph, variableNodes, Wcombined, inputs, B[i], BArgName);
 
         // ==== Step 5. Create output nodes =====
@@ -3781,7 +3781,7 @@ LotusIR::Node* CNTKToONNXHelper::CreateONNXNodesForOptimizedRNNStack(const Funct
 
         // ==== Step 6. Add ONNX LSTM node ====
         auto rnnOpNameLookup = Operators::OptimizedRnnToOnnxOpLookup();
-        auto rnnNodeName = (src->Name().empty() ? ToString(src->Uid()) : ToString(src->Name())) + std::to_string(i);
+        auto rnnNodeName = (src->Name().empty() ? ToLegacyString(ToUTF8(src->Uid())) : ToLegacyString(ToUTF8(src->Name()))) + std::to_string(i);
         functionNode = graph->AddNode(rnnNodeName, rnnOpNameLookup[recurrentOp], "", inputs, outputs);
 
         std::vector<std::string> singleDirectionActivation;

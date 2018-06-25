@@ -15,6 +15,7 @@
 #include <memory>
 
 using namespace CNTK;
+using namespace Microsoft::MSR::CNTK;
 
 namespace CNTK
 {
@@ -37,14 +38,14 @@ namespace CNTK
     {
         if (function->Inputs().size() == 0)
         {
-            cout << string(spaces, '.') + "(" + Microsoft::MSR::CNTK::ToString(useName ? function->Name() : function->Uid()) + ")" + Microsoft::MSR::CNTK::ToString(function->AsString()) << std::endl;
+            cout << string(spaces, '.') + "(" + ToLegacyString(ToUTF8(useName ? function->Name() : function->Uid())) + ")" + ToLegacyString(ToUTF8(function->AsString())) << std::endl;
             return;
         }
 
         for (auto input : function->Inputs())
         {
-            cout << string(spaces, '.') + "(" + Microsoft::MSR::CNTK::ToString(useName ? function->Name() : function->Uid()) + ")" + "->" +
-                        "(" + Microsoft::MSR::CNTK::ToString(useName ? input.Name() : input.Uid()) + ")" + Microsoft::MSR::CNTK::ToString(input.AsString())
+            cout << string(spaces, '.') + "(" + ToLegacyString(ToUTF8(useName ? function->Name() : function->Uid())) + ")" + "->" +
+                        "(" + ToLegacyString(ToUTF8(useName ? input.Name() : input.Uid())) + ")" + ToLegacyString(ToUTF8(input.AsString()))
                  << std::endl;
         }
 

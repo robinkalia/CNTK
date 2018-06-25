@@ -309,7 +309,7 @@ void CompositeDataReader::CreateTransforms(const ConfigParameters& deserializerC
         if (inputBody.find("transforms") == inputBody.end())
             continue;
 
-        std::wstring inputName = Microsoft::MSR::CNTK::ToWString(section.first, false);
+        std::wstring inputName = Microsoft::MSR::CNTK::ToFixedWString(section.first, false);
 
         // Read transformers in order and appending them to the transformer pipeline.
         argvector<ConfigParameters> transforms = inputBody("transforms");

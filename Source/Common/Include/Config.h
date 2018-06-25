@@ -125,7 +125,7 @@ public:
 
     operator std::wstring() const
     {
-        return Microsoft::MSR::CNTK::ToWString(*this, false);
+        return Microsoft::MSR::CNTK::ToFixedWString(*this, false);
     }
     operator double() const
     {

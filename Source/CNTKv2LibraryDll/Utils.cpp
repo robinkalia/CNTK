@@ -470,32 +470,6 @@ namespace CNTK
         return fd;
     }
 
-// BugBug     std::string ToString(const std::wstring& wstring)
-// BugBug     {
-// BugBug #ifdef _MSC_VER
-// BugBug         std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
-// BugBug         return converter.to_bytes(wstring);
-// BugBug #else
-// BugBug         const auto length = wstring.length() * sizeof(std::wstring::value_type) + 1;
-// BugBug         char buf[length];
-// BugBug         const auto res = std::wcstombs(buf, wstring.c_str(), sizeof(buf));
-// BugBug         return (res >= 0) ? buf : "";
-// BugBug #endif
-// BugBug     }
-// BugBug 
-// BugBug     std::wstring ToWString(const std::string& string)
-// BugBug     {
-// BugBug #ifdef _MSC_VER
-// BugBug         std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
-// BugBug         return converter.from_bytes(string);
-// BugBug #else
-// BugBug         const auto length = string.length() + 1;
-// BugBug         wchar_t buf[length];
-// BugBug         const auto res = std::mbstowcs(buf, string.c_str(),  sizeof(buf));
-// BugBug         return (res >= 0) ? buf : L"";
-// BugBug #endif
-// BugBug     }
-
     bool IsFirstOutputOfMultiOutputFunction(const Variable& var)
     {
         if (!var.IsOutput())

@@ -36,13 +36,13 @@ namespace CNTK {
             for (const pair<string, ConfigParameters>& section : input)
             {
                 ConfigParameters sectionConfig = section.second;
-                wstring name = Microsoft::MSR::CNTK::ToWString(section.first, false);
+                wstring name = Microsoft::MSR::CNTK::ToFixedWString(section.first, false);
 
                 // If there is an option for "alias", we will rename the stream with the "alias"
                 // name to the target name.
                 if (sectionConfig.ExistsCurrent(L"alias"))
                 {
-                    wstring alias = Microsoft::MSR::CNTK::ToWString(sectionConfig(L"alias"), false);
+                    wstring alias = Microsoft::MSR::CNTK::ToFixedWString(sectionConfig(L"alias"), false);
                     m_streams[alias] = name;
                 }
                 else
@@ -64,7 +64,7 @@ namespace CNTK {
             RuntimeError("Not supported precision '%s'. Expected 'double' or 'float'.", precision.c_str());
         }
 
-        m_filepath = Microsoft::MSR::CNTK::ToWString(config(L"file"), false);
+        m_filepath = Microsoft::MSR::CNTK::ToFixedWString(config(L"file"), false);
         m_keepDataInMemory = config(L"keepDataInMemory", false);
 
         m_randomizationWindow = GetRandomizationWindowFromConfig(config);
