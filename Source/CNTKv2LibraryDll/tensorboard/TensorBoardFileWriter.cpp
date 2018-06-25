@@ -62,7 +62,7 @@ namespace CNTK
 
             filename << L"events.out.tfevents." 
                 << std::setfill(L'0') << std::setw(10) << time
-                << L"." << ToWString(GetHostName());
+                     << L"." << Microsoft::MSR::CNTK::ToWString(GetHostName());
             return filename.str();
         }
 
@@ -95,7 +95,7 @@ namespace CNTK
 
             msra::files::make_intermediate_dirs(filePath);
 
-            m_file = fopenOrDie(ToString(filePath), "wb");
+            m_file = fopenOrDie(Microsoft::MSR::CNTK::ToString(filePath), "wb");
             m_fileName = filePath;
 
             // Write the first record with the current version, and flush
@@ -118,7 +118,7 @@ namespace CNTK
 
             tensorflow::Summary* summary = event.mutable_summary();
             tensorflow::Summary::Value* summaryValue = summary->add_value();
-            summaryValue->set_tag(ToString(name));
+            summaryValue->set_tag(Microsoft::MSR::CNTK::ToString(name));
             summaryValue->set_simple_value(value);
 
             WriteRecord(Serialize(event));
@@ -205,7 +205,7 @@ namespace CNTK
 
             for (size_t i = 0; i < batch_size; i++) {
                 tensorflow::Summary::Value* summaryValue = summary->add_value();
-                summaryValue->set_tag(ToString(name) + "/image/" + std::to_string(i));
+                summaryValue->set_tag(Microsoft::MSR::CNTK::ToString(name) + "/image/" + std::to_string(i));
 
                 tensorflow::Summary::Image* summaryImage = summaryValue->mutable_image();
                 summaryImage->set_height(height);
