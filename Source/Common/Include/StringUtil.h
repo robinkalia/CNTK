@@ -82,26 +82,28 @@ static std::u32string ToUTF32(std::wstring const& value);
 static std::u32string ToUTF32(std::vector<unsigned char> const& value);
 static std::u32string ToUTF32(std::u16string const& value);
 
-static std::string ToString(char const* str, bool isFixedWidth = true);
-static std::string ToString(wchar_t const* str);
-static std::string ToString(unsigned char const* str);
-static std::string ToString(char16_t const* str);
-static std::string ToString(char32_t const* str);
-static std::string ToString(std::string const&, bool isFixedWidth = true);
-static std::string ToString(std::wstring const& value);
-static std::string ToString(std::vector<unsigned char> const& value);
-static std::string ToString(std::u16string const& value);
-static std::string ToString(std::u32string const& value);
+// Fixed width; 1 byte per char
+static std::string ToFixedString(char const* str, bool isFixedWidth = true);
+static std::string ToFixedString(wchar_t const* str);
+static std::string ToFixedString(unsigned char const* str);
+static std::string ToFixedString(char16_t const* str);
+static std::string ToFixedString(char32_t const* str);
+static std::string ToFixedString(std::string const&, bool isFixedWidth = true);
+static std::string ToFixedString(std::wstring const& value);
+static std::string ToFixedString(std::vector<unsigned char> const& value);
+static std::string ToFixedString(std::u16string const& value);
+static std::string ToFixedString(std::u32string const& value);
 
-static std::wstring ToWString(char const* str, bool isFixedWidth = true);
-static std::wstring ToWString(wchar_t const* str);
-static std::wstring ToWString(unsigned char const* str);
-static std::wstring ToWString(char16_t const* str);
-static std::wstring ToWString(char32_t const* str);
-static std::wstring ToWString(std::string const& value, bool isFixedWidth = true);
-static std::wstring ToWString(std::vector<unsigned char> const& value);
-static std::wstring ToWString(std::u16string const& value);
-static std::wstring ToWString(std::u32string const& value);
+// Fixed with; 2 (Windows) or 4 (Linux) bytes per char
+static std::wstring ToFixedWString(char const* str, bool isFixedWidth/* BugBug = true*/);
+static std::wstring ToFixedWString(wchar_t const* str);
+static std::wstring ToFixedWString(unsigned char const* str);
+static std::wstring ToFixedWString(char16_t const* str);
+static std::wstring ToFixedWString(char32_t const* str);
+static std::wstring ToFixedWString(std::string const& value, bool isFixedWidth/* BugBug = true*/);
+static std::wstring ToFixedWString(std::vector<unsigned char> const& value);
+static std::wstring ToFixedWString(std::u16string const& value);
+static std::wstring ToFixedWString(std::u32string const& value);
 
 // Convert a multibyte string to a std::string without applying any conversion.
 //
@@ -368,28 +370,28 @@ namespace
 {
 
 template <typename T> 
-std::string ToString_WcharSize(T const* str, std::integral_constant<size_t, 4>)
+std::string ToFixedString_WcharSize(T const* str, std::integral_constant<size_t, 4>)
 {
     static_assert(std::is_same<T, wchar_t>::value, "Template in support of SFINAE");
-    return ToString(reinterpret_cast<char32_t const*>(str));
+    return ToFixedString(reinterpret_cast<char32_t const*>(str));
 }
 
 template <typename T>
-std::string ToString_WcharSize(T const* str, std::integral_constant<size_t, 2>)
+std::string ToFixedString_WcharSize(T const* str, std::integral_constant<size_t, 2>)
 {
     static_assert(std::is_same<T, wchar_t>::value, "Template in support of SFINAE");
-    return ToString(ToUTF32(str));
+    return ToFixedString(ToUTF32(str));
 }
 
 template <typename T>
-std::wstring ToWString_WcharSize(T const* str, std::integral_constant<size_t, 4>)
+std::wstring ToFixedWString_WcharSize(T const* str, std::integral_constant<size_t, 4>)
 {
     static_assert(std::is_same<T, char32_t>::value, "Template in support of SFINAE");
     return reinterpret_cast<wchar_t const*>(str);
 }
 
 template <typename T>
-std::wstring ToWString_WcharSize(T const* str, std::integral_constant<size_t, 2>)
+std::wstring ToFixedWString_WcharSize(T const* str, std::integral_constant<size_t, 2>)
 {
     static_assert(std::is_same<T, char32_t>::value, "Template in support of SFINAE");
 
@@ -407,33 +409,33 @@ std::wstring ToWString_WcharSize(T const* str, std::integral_constant<size_t, 2>
 
 } // anonymous namespace
 
-static inline std::string ToString(char const* str, bool isFixedWidth /* =true */)
+static inline std::string ToFixedString(char const* str, bool isFixedWidth /* =true */)
 {
     if (isFixedWidth == false)
-        return ToString(reinterpret_cast<unsigned char const*>(str));
+        return ToFixedString(reinterpret_cast<unsigned char const*>(str));
 
     return str ? std::string(str) : std::string();
 }
 
-static inline std::string ToString(wchar_t const* str)
+static inline std::string ToFixedString(wchar_t const* str)
 {
     if (str == nullptr)
         return std::string();
 
-    return ToString_WcharSize(str, std::integral_constant<size_t, sizeof(wchar_t)>());
+    return ToFixedString_WcharSize(str, std::integral_constant<size_t, sizeof(wchar_t)>());
 }
 
-static inline std::string ToString(unsigned char const* str)
+static inline std::string ToFixedString(unsigned char const* str)
 {
-    return str ? ToString(ToUTF32(str)) : std::string();
+    return str ? ToFixedString(ToUTF32(str)) : std::string();
 }
 
-static inline std::string ToString(char16_t const* str)
+static inline std::string ToFixedString(char16_t const* str)
 {
-    return str ? ToString(ToUTF32(str)) : std::string();
+    return str ? ToFixedString(ToUTF32(str)) : std::string();
 }
 
-static inline std::string ToString(char32_t const* str)
+static inline std::string ToFixedString(char32_t const* str)
 {
     if (str == nullptr)
         return std::string();
@@ -450,77 +452,77 @@ static inline std::string ToString(char32_t const* str)
     return result;
 }
 
-static inline std::string ToString(std::string const& value, bool isFixedWidth /* =true */)
+static inline std::string ToFixedString(std::string const& value, bool isFixedWidth /* =true */)
 {
-    return ToString(value.c_str(), isFixedWidth);
+    return ToFixedString(value.c_str(), isFixedWidth);
 }
 
-static inline std::string ToString(std::wstring const& value)
+static inline std::string ToFixedString(std::wstring const& value)
 {
-    return ToString(value.c_str());
+    return ToFixedString(value.c_str());
 }
 
-static inline std::string ToString(std::vector<unsigned char> const& value)
+static inline std::string ToFixedString(std::vector<unsigned char> const& value)
 {
-    return ToString(value.data());
+    return ToFixedString(value.data());
 }
 
-static inline std::string ToString(std::u16string const& value)
+static inline std::string ToFixedString(std::u16string const& value)
 {
-    return ToString(value.c_str());
+    return ToFixedString(value.c_str());
 }
 
-static inline std::string ToString(std::u32string const& value)
+static inline std::string ToFixedString(std::u32string const& value)
 {
-    return ToString(value.c_str());
+    return ToFixedString(value.c_str());
 }
 
-static inline std::wstring ToWString(char const* str, bool isFixedWidth /* =true */)
+static inline std::wstring ToFixedWString(char const* str, bool isFixedWidth /* =true */)
 {
     if (isFixedWidth == false)
-        return ToWString(reinterpret_cast<unsigned char const*>(str));
+        return ToFixedWString(reinterpret_cast<unsigned char const*>(str));
 
     return SimpleConversionImpl<std::wstring>(str);
 }
 
-static inline std::wstring ToWString(wchar_t const* str)
+static inline std::wstring ToFixedWString(wchar_t const* str)
 {
     return str ? std::wstring(str) : std::wstring();
 }
 
-static inline std::wstring ToWString(unsigned char const* str)
+static inline std::wstring ToFixedWString(unsigned char const* str)
 {
-    return str ? ToWString(ToUTF32(str)) : std::wstring();
+    return str ? ToFixedWString(ToUTF32(str)) : std::wstring();
 }
 
-static inline std::wstring ToWString(char16_t const* str)
+static inline std::wstring ToFixedWString(char16_t const* str)
 {
-    return str ? ToWString(ToUTF32(str)) : std::wstring();
+    return str ? ToFixedWString(ToUTF32(str)) : std::wstring();
 }
 
-static inline std::wstring ToWString(char32_t const* str)
+static inline std::wstring ToFixedWString(char32_t const* str)
 {
-    return str ? ToWString_WcharSize(str, std::integral_constant<size_t, sizeof(wchar_t)>()) : std::wstring();
+    return str ? ToFixedWString_WcharSize(str, std::integral_constant<size_t, sizeof(wchar_t)>()) : std::wstring();
 }
 
-static inline std::wstring ToWString(std::string const& value, bool isFixedWidth /* =true */)
+static inline std::wstring ToFixedWString(std::string const& value, bool isFixedWidth /* =true */)
 {
-    return ToWString(value.c_str(), isFixedWidth);
+    return ToFixedWString(value.c_str(), isFixedWidth);
 }
 
-static inline std::wstring ToWString(std::vector<unsigned char> const& value)
+static inline std::wstring ToFixedWString(std::vector<unsigned char> const& value)
 {
-    return ToWString(value.data());
+    return ToFixedWString(value.data());
 }
 
-static inline std::wstring ToWString(std::u16string const& value)
+static inline std::wstring ToFixedWString(std::u16string const& value)
 {
-    return ToWString(value.c_str());
+    return ToFixedWString(value.c_str());
 }
 
-static inline std::wstring ToWString(std::u32string const& value)
+static inline std::wstring ToFixedWString(std::u32string const& value)
 {
-    return ToWString(value.c_str());
+    return ToFixedWString(value.c_str());
 }
 
 static inline std::string ToLegacyString(unsigned char const* str)

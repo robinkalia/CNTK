@@ -80,12 +80,12 @@ public:
 
     wstring GetError(const std::wstring& linePrefix) const override
     {
-        return TextLocation::CreateIssueMessage(locations, linePrefix.c_str(), kind(), Microsoft::MSR::CNTK::ToWString(what(), false).c_str());
+        return TextLocation::CreateIssueMessage(locations, linePrefix.c_str(), kind(), Microsoft::MSR::CNTK::ToFixedWString(what(), false).c_str());
     }
     // pretty-print this as an error message
     void /*ScriptingException::*/ PrintError(const std::wstring& linePrefix) const override
     {
-        TextLocation::PrintIssue(locations, linePrefix.c_str(), kind(), Microsoft::MSR::CNTK::ToWString(what(), false).c_str());
+        TextLocation::PrintIssue(locations, linePrefix.c_str(), kind(), Microsoft::MSR::CNTK::ToFixedWString(what(), false).c_str());
     }
     void AddLocation(TextLocation where)
     {

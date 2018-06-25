@@ -764,7 +764,7 @@ public:
     }
     auto_file_ptr(const wchar_t* wpath, const char* mode)
     {
-        f = _wfopen(wpath, Microsoft::MSR::CNTK::ToWString(mode, false).c_str());
+        f = _wfopen(wpath, Microsoft::MSR::CNTK::ToFixedWString(mode, false).c_str());
         if (f == NULL)
             openfailed(Microsoft::MSR::CNTK::ToLegacyString(Microsoft::MSR::CNTK::ToUTF8(wpath)));
     }
@@ -848,7 +848,7 @@ public:
     }
     std::wstring wgetline()
     {
-        return Microsoft::MSR::CNTK::ToWString(getline(), false);
+        return Microsoft::MSR::CNTK::ToFixedWString(getline(), false);
     }
 };
 }

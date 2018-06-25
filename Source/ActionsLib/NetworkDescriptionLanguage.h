@@ -412,7 +412,7 @@ public:
         std::wstring newBase = baseName;
         if (!newBase.empty())
             newBase += L".";
-        newBase += Microsoft::MSR::CNTK::ToWString(m_name, false);
+        newBase += Microsoft::MSR::CNTK::ToFixedWString(m_name, false);
 
         // now evaluate  the contained macro script
         NDLNode<ElemType>* nodeResult = m_script->Evaluate(nodeEval, newBase, pass);
