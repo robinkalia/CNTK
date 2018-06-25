@@ -1933,7 +1933,7 @@ void expand_wildcards(const wstring& path, vector<wstring>& paths)
 
     for (unsigned int i = 0; i < globResult.gl_pathc; ++i)
     {
-        paths.push_back(Microsoft::MSR::CNTK::ToWString(globResult.gl_pathv[i], false));
+        paths.push_back(Microsoft::MSR::CNTK::ToFixedWString(globResult.gl_pathv[i], false));
     }
     globfree(&globResult);
 #endif
@@ -2040,7 +2040,7 @@ std::vector<std::wstring> msra::files::get_all_files_from_directory(const std::w
         if ((st.st_mode & S_IFDIR) != 0)
             continue;
 
-        result.push_back(Microsoft::MSR::CNTK::ToWString(fileName, false));
+        result.push_back(Microsoft::MSR::CNTK::ToFixedWString(fileName, false));
     }
     closedir(dirp);
 #endif

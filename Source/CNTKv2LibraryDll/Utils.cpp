@@ -462,7 +462,7 @@ namespace CNTK
         mode = mode | O_BINARY;
         fd = _wopen(filePath.c_str(), mode, 0644);
 #else
-        fd = open(ToString(filePath).c_str(), mode, 0644);
+        fd = open(ToLegacyString(ToUTF8(filePath)).c_str(), mode, 0644);
 #endif
         if (fd < 0)
             RuntimeError("Cannot open file '%S' for %s.", filePath.c_str(), (readOnly ? "reading" : "writing"));
