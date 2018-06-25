@@ -95,12 +95,12 @@ static std::string ToFixedString(std::u16string const& value);
 static std::string ToFixedString(std::u32string const& value);
 
 // Fixed with; 2 (Windows) or 4 (Linux) bytes per char
-static std::wstring ToFixedWString(char const* str, bool isFixedWidth/* BugBug = true*/);
+static std::wstring ToFixedWString(char const* str, bool isFixedWidth = true); 
 static std::wstring ToFixedWString(wchar_t const* str);
 static std::wstring ToFixedWString(unsigned char const* str);
 static std::wstring ToFixedWString(char16_t const* str);
 static std::wstring ToFixedWString(char32_t const* str);
-static std::wstring ToFixedWString(std::string const& value, bool isFixedWidth/* BugBug = true*/);
+static std::wstring ToFixedWString(std::string const& value, bool isFixedWidth = true);
 static std::wstring ToFixedWString(std::vector<unsigned char> const& value);
 static std::wstring ToFixedWString(std::u16string const& value);
 static std::wstring ToFixedWString(std::u32string const& value);
