@@ -37,14 +37,15 @@ namespace CNTK
     {
         if (function->Inputs().size() == 0)
         {
-            cout << string(spaces, '.') + "(" + ToString(useName ? function->Name() : function->Uid()) + ")" + ToString(function->AsString()) << std::endl;
+            cout << string(spaces, '.') + "(" + Microsoft::MSR::CNTK::ToString(useName ? function->Name() : function->Uid()) + ")" + Microsoft::MSR::CNTK::ToString(function->AsString()) << std::endl;
             return;
         }
 
         for (auto input : function->Inputs())
         {
-            cout << string(spaces, '.') + "(" + ToString(useName ? function->Name() : function->Uid()) + ")" + "->" +
-                "(" + ToString(useName ? input.Name() : input.Uid()) + ")" + ToString(input.AsString()) << std::endl;
+            cout << string(spaces, '.') + "(" + Microsoft::MSR::CNTK::ToString(useName ? function->Name() : function->Uid()) + ")" + "->" +
+                        "(" + Microsoft::MSR::CNTK::ToString(useName ? input.Name() : input.Uid()) + ")" + Microsoft::MSR::CNTK::ToString(input.AsString())
+                 << std::endl;
         }
 
         for (auto input : function->Inputs())
