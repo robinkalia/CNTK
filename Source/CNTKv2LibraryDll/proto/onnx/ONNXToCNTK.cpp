@@ -2710,22 +2710,22 @@ FunctionPtr ONNXToCNTKHelper::CreateFunction(const Node *node, const std::vector
     }
     else if (onnxOpName == "Sin")
     {
-        FunctionPtr cntkFunction = Sin(inputs[0], ToWString(node->Name()));
+        FunctionPtr cntkFunction = Sin(inputs[0], ToFixedWString(node->Name(), false));
         return cntkFunction;
     }
     else if (onnxOpName == "Asin")
     {
-        FunctionPtr cntkFunction = Asin(inputs[0], ToWString(node->Name()));
+        FunctionPtr cntkFunction = Asin(inputs[0], ToFixedWString(node->Name(), false));
         return cntkFunction;
     }
     else if (onnxOpName == "Cos")
     {
-        FunctionPtr cntkFunction = Cos(inputs[0], ToWString(node->Name()));
+        FunctionPtr cntkFunction = Cos(inputs[0], ToFixedWString(node->Name(), false));
         return cntkFunction;
     }
     else if (onnxOpName == "Acos")
     {
-        FunctionPtr cntkFunction = Acos(inputs[0], ToWString(node->Name()));
+        FunctionPtr cntkFunction = Acos(inputs[0], ToFixedWString(node->Name(), false));
         return cntkFunction;
     }
     else if (onnxOpName == "Cast")
