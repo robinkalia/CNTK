@@ -15,6 +15,15 @@
     // The versions of GCC that we are using (5.4), don't provide cuchar. However, cuchar is a thin wrapper over
     // uchar.h, so we can include that directly.
 #   include <uchar.h>
+
+    namespace std {
+        using _CSTD mbstate_t;
+        using _CSTD size_t;
+        using _CSTD mbrtoc16;
+        using _CSTD c16rtomb;
+        using _CSTD mbrtoc32;
+        using _CSTD c32rtomb;
+    }
 #endif
 
 namespace Microsoft
