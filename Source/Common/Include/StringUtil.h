@@ -6,9 +6,16 @@
 #pragma once
 
 #include <codecvt>
-#include <cuchar>
 #include <string>
 #include <vector>
+
+#if defined (_MSC_VER)
+#   include <cuchar>
+#else
+    // The versions of GCC that we are using (5.4), don't provide cuchar. However, cuchar is a thin wrapper over
+    // uchar.h, so we can include that directly.
+#   include <uchar.h>
+#endif
 
 namespace Microsoft
 {
