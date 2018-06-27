@@ -698,7 +698,7 @@ void renameOrDie(const std::wstring& from, const std::wstring& to)
 void copyOrDie(const string& from, const string& to)
 {
     // Call wide string implementation.
-    copyOrDie(s2ws(from), s2ws(to));
+    copyOrDie(Microsoft::MSR::CNTK::ToFixedWString(from, false), Microsoft::MSR::CNTK::ToFixedWString(to, false));
 }
 
 void copyOrDie(const wstring& from, const wstring& to)
@@ -2111,27 +2111,4 @@ static inline std::wstring mbstowcs(const std::string& p) // input: MBCS
     // OACR_WARNING_SUPPRESS(UNSAFE_STRING_FUNCTION, "Reviewed OK. size checked. [rogeryu 2006/03/21]");
     ::mbstowcs(&buf[0], p.c_str(), len + 1);
     return std::wstring(&buf[0]);
-}
-
-wstring s2ws(const string& str)
-{
-#ifdef __unix__
-    return mbstowcs(str);
-#else
-    typedef std::codecvt_utf8<wchar_t> convert_typeX;
-    std::wstring_convert<convert_typeX, wchar_t> converterX;
-    return converterX.from_bytes(str);
-
-#endif
-}
-
-string ws2s(const wstring& wstr)
-{
-#ifdef __unix__
-    return wcstombs(wstr);
-#else
-    typedef codecvt_utf8<wchar_t> convert_typeX;
-    wstring_convert<convert_typeX, wchar_t> converterX;
-    return converterX.to_bytes(wstr);
-#endif
 }

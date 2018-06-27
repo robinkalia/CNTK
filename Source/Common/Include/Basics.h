@@ -288,14 +288,7 @@ typedef ::msra::strfun::_strprintf<wchar_t> wstrprintf; // wchar_t version
 
 static inline cstring charpath(const std::wstring& p)
 {
-#ifdef _MSC_VER
-    return std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>>().to_bytes(p);
-#else // old version, delete once we know it works
-    size_t len = p.length();
-    std::vector<char> buf(2 * len + 1, 0); // max: 1 wchar => 2 mb chars
-    ::wcstombs(buf.data(), p.c_str(), 2 * len + 1);
-    return msra::strfun::cstring(&buf[0]);
-#endif
+    return Microsoft::MSR::CNTK::ToLegacyString(Microsoft::MSR::CNTK::ToUTF8(p));
 }
 
 // ----------------------------------------------------------------------------
