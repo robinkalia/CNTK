@@ -276,11 +276,11 @@ void DoWriteWordAndClassInfo(const ConfigParameters& config)
     bool makeMode = config(L"makeMode", true);
     if (makeMode)
     {
-        bool done = msra::files::fuptodate(s2ws(outputVocabFile), s2ws(inputFile), /*inputRequired=*/false);
+        bool done = msra::files::fuptodate(Microsoft::MSR::CNTK::ToFixedWString(outputVocabFile, false), Microsoft::MSR::CNTK::ToFixedWString(inputFile, false), /*inputRequired=*/false);
         if (nbrCls > 0)
         {
-            done &= msra::files::fuptodate(s2ws(outputWord2Cls),  s2ws(inputFile), /*inputRequired=*/false);
-            done &= msra::files::fuptodate(s2ws(outputCls2Index), s2ws(inputFile), /*inputRequired=*/false);
+            done &= msra::files::fuptodate(Microsoft::MSR::CNTK::ToFixedWString(outputWord2Cls, false), Microsoft::MSR::CNTK::ToFixedWString(inputFile, false), /*inputRequired=*/false);
+            done &= msra::files::fuptodate(Microsoft::MSR::CNTK::ToFixedWString(outputCls2Index, false), Microsoft::MSR::CNTK::ToFixedWString(inputFile, false), /*inputRequired=*/false);
         }
         if (done)
         {
@@ -449,7 +449,7 @@ void DoWriteWordAndClassInfo(const ConfigParameters& config)
     // write the files
     if (!outputMappingFile.empty())
     {
-        msra::files::make_intermediate_dirs(s2ws(outputMappingFile));
+        msra::files::make_intermediate_dirs(Microsoft::MSR::CNTK::ToFixedWString(outputMappingFile, false));
         ofstream ofmapping(outputMappingFile.c_str());
         for (let& word : m_words)
             ofmapping << word << endl;
@@ -457,7 +457,7 @@ void DoWriteWordAndClassInfo(const ConfigParameters& config)
         cerr << "Created label-mapping file with " << v_count.size() << " entries.\n";
     }
 
-    msra::files::make_intermediate_dirs(s2ws(outputVocabFile));
+    msra::files::make_intermediate_dirs(Microsoft::MSR::CNTK::ToFixedWString(outputVocabFile, false));
     ofstream ofvocab(outputVocabFile.c_str());
     for (size_t i = 0; i < m_words.size(); i++)
     {
@@ -478,7 +478,7 @@ void DoWriteWordAndClassInfo(const ConfigParameters& config)
     {
         // write the outputs
         // TODO: use safe-save, i.e. write to temp name and rename at the end
-        msra::files::make_intermediate_dirs(s2ws(outputWord2Cls));
+        msra::files::make_intermediate_dirs(Microsoft::MSR::CNTK::ToFixedWString(outputWord2Cls, false));
         ofstream owfp(outputWord2Cls.c_str());
         if (!owfp)
             RuntimeError("Failed to write to %s", outputWord2Cls.c_str());
@@ -487,7 +487,7 @@ void DoWriteWordAndClassInfo(const ConfigParameters& config)
         owfp.close();
         cerr << "Created word-to-class map with " << wrd2cls.GetNumRows() << " entries.\n";
 
-        msra::files::make_intermediate_dirs(s2ws(outputCls2Index));
+        msra::files::make_intermediate_dirs(Microsoft::MSR::CNTK::ToFixedWString(outputCls2Index, false));
         ofstream ocfp(outputCls2Index.c_str());
         if (!ocfp)
             RuntimeError("Failed to write to %s", outputCls2Index.c_str());
