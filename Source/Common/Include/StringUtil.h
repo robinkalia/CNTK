@@ -11,19 +11,22 @@
 
 #if defined (_MSC_VER)
 #   include <cuchar>
+
+// These methods aren't in the std namespace on Linux, so make them available in a way that is consistent with
+// both without polluting the global namespace.
+namespace {
+
+using std::mbrtoc16;
+using std::mbrtoc32;
+using std::c16rtomb;
+
+} // anonymous namespace
+
 #else
     // The versions of GCC that we are using (5.4), don't provide cuchar. However, cuchar is a thin wrapper over
     // uchar.h, so we can include that directly.
 #   include <uchar.h>
 
-    namespace std {
-        using _CSTD mbstate_t;
-        using _CSTD size_t;
-        using _CSTD mbrtoc16;
-        using _CSTD c16rtomb;
-        using _CSTD mbrtoc32;
-        using _CSTD c32rtomb;
-    }
 #endif
 
 namespace Microsoft
@@ -243,7 +246,7 @@ std::vector<unsigned char> ToUTF8_WcharSize(T const* str, std::integral_constant
     static_assert(std::is_same<T, wchar_t>::value, "Template in support of SFINAE");
 
     // Convert from UCS-2 to UTF8 using a UTF16 algorithm. This is safe since UCS-2 is a subset of UTF16
-    return ToUTF8Impl(reinterpret_cast<char16_t const*>(str), &std::c16rtomb);
+    return ToUTF8Impl(reinterpret_cast<char16_t const*>(str), &c16rtomb);
 }
 
 template <typename T>
@@ -252,7 +255,7 @@ std::vector<unsigned char> ToUTF8_WcharSize(T const* str, std::integral_constant
     static_assert(std::is_same<T, wchar_t>::value, "Template in support of SFINAE");
 
     // Convert from UCS-4 to UTF8 using a UTF32 algorithm. This is safe since UCS-4 == UTF32
-    return ToUTF8Impl(reinterpret_cast<char32_t const*>(str), &std::c32rtomb);
+    return ToUTF8Impl(reinterpret_cast<char32_t const*>(str), &c32rtomb);
 }
 
 template <typename T>
@@ -285,11 +288,11 @@ static inline std::vector<unsigned char> ToUTF8(unsigned char const* str)
 }
 static inline std::vector<unsigned char> ToUTF8(char16_t const* str)
 {
-    return ToUTF8Impl(str, &std::c16rtomb);
+    return ToUTF8Impl(str, &c16rtomb);
 }
 static inline std::vector<unsigned char> ToUTF8(char32_t const* str)
 {
-    return ToUTF8Impl(str, &std::c32rtomb);
+    return ToUTF8Impl(str, &c32rtomb);
 }
 static inline std::vector<unsigned char> ToUTF8(std::string const& value, bool isFixedWidth /* =true */)
 {
@@ -318,7 +321,7 @@ static inline std::u16string ToUTF16(wchar_t const* str)
 }
 static inline std::u16string ToUTF16(unsigned char const* str)
 {
-    return UTF8ToUTFXXImpl<std::u16string>(reinterpret_cast<char const*>(str), &std::mbrtoc16);
+    return UTF8ToUTFXXImpl<std::u16string>(reinterpret_cast<char const*>(str), &mbrtoc16);
 }
 static inline std::u16string ToUTF16(char16_t const* str)
 {
@@ -355,7 +358,7 @@ static inline std::u32string ToUTF32(wchar_t const* str)
 }
 static inline std::u32string ToUTF32(unsigned char const* str)
 {
-    return UTF8ToUTFXXImpl<std::u32string>(reinterpret_cast<char const*>(str), &std::mbrtoc32);
+    return UTF8ToUTFXXImpl<std::u32string>(reinterpret_cast<char const*>(str), &mbrtoc32);
 }
 static inline std::u32string ToUTF32(char16_t const* str)
 {
