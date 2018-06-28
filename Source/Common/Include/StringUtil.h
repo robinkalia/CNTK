@@ -29,12 +29,9 @@ using std::c16rtomb;
 
 #endif
 
-namespace Microsoft
-{
-namespace MSR
-{
-namespace CNTK
-{
+namespace Microsoft {
+namespace MSR {
+namespace CNTK {
 
 // Compares two ASCII strings ignoring the case.
 // TODO: Should switch to boost, boost::iequal should be used instead.
@@ -113,7 +110,7 @@ static std::string ToFixedString(std::vector<unsigned char> const& value);
 static std::string ToFixedString(std::u16string const& value);
 static std::string ToFixedString(std::u32string const& value);
 
-// Fixed with; 2 (Windows) or 4 (Linux) bytes per char
+// Fixed width; 2 (Windows) or 4 (Linux) bytes per char
 static std::wstring ToFixedWString(char const* str, bool isFixedWidth = true); 
 static std::wstring ToFixedWString(wchar_t const* str);
 static std::wstring ToFixedWString(unsigned char const* str);
@@ -137,8 +134,7 @@ static std::string ToLegacyString(std::vector<unsigned char> const& value);
 // |  Implementation
 // |
 // ----------------------------------------------------------------------
-namespace
-{
+namespace {
 
 template <typename T>
 T&& SingleConversionImpl_ApplySuffix(T&& value)
@@ -278,34 +274,42 @@ static inline std::vector<unsigned char> ToUTF8(char const* str, bool isFixedWid
 {
     return isFixedWidth ? SimpleConversionImpl<std::vector<unsigned char>>(str) : ToUTF8(reinterpret_cast<unsigned char const*>(str));
 }
+
 static inline std::vector<unsigned char> ToUTF8(wchar_t const* str)
 {
     return ToUTF8_WcharSize(str, std::integral_constant<size_t, sizeof(wchar_t)>());
 }
+
 static inline std::vector<unsigned char> ToUTF8(unsigned char const* str)
 {
     return SimpleConversionImpl<std::vector<unsigned char>>(str);
 }
+
 static inline std::vector<unsigned char> ToUTF8(char16_t const* str)
 {
     return ToUTF8Impl(str, &c16rtomb);
 }
+
 static inline std::vector<unsigned char> ToUTF8(char32_t const* str)
 {
     return ToUTF8Impl(str, &c32rtomb);
 }
+
 static inline std::vector<unsigned char> ToUTF8(std::string const& value, bool isFixedWidth /* =true */)
 {
     return ToUTF8(value.c_str(), isFixedWidth);
 }
+
 static inline std::vector<unsigned char> ToUTF8(std::wstring const& value)
 {
     return ToUTF8(value.c_str());
 }
+
 static inline std::vector<unsigned char> ToUTF8(std::u16string const& value)
 {
     return ToUTF8(value.c_str());
 }
+
 static inline std::vector<unsigned char> ToUTF8(std::u32string const& value)
 {
     return ToUTF8(value.c_str());
@@ -315,34 +319,42 @@ static inline std::u16string ToUTF16(char const* str, bool isFixedWidth /* =true
 {
     return isFixedWidth ? SimpleConversionImpl<std::u16string>(str) : ToUTF16(reinterpret_cast<unsigned char const*>(str));
 }
+
 static inline std::u16string ToUTF16(wchar_t const* str)
 {
     return ToUTF16_WcharSize(str, std::integral_constant<size_t, sizeof(wchar_t)>());
 }
+
 static inline std::u16string ToUTF16(unsigned char const* str)
 {
     return UTF8ToUTFXXImpl<std::u16string>(reinterpret_cast<char const*>(str), &mbrtoc16);
 }
+
 static inline std::u16string ToUTF16(char16_t const* str)
 {
     return SimpleConversionImpl<std::u16string>(str);
 }
+
 static inline std::u16string ToUTF16(char32_t const* str)
 {
     return ToUTF16(ToUTF8(str));
 }
+
 static inline std::u16string ToUTF16(std::string const& value, bool isFixedWidth /* =true */)
 {
     return ToUTF16(value.c_str(), isFixedWidth);
 }
+
 static inline std::u16string ToUTF16(std::wstring const& value)
 {
     return ToUTF16(value.c_str());
 }
+
 static inline std::u16string ToUTF16(std::vector<unsigned char> const& value)
 {
     return ToUTF16(value.data());
 }
+
 static inline std::u16string ToUTF16(std::u32string const& value)
 {
     return ToUTF16(value.c_str());
@@ -352,41 +364,48 @@ static inline std::u32string ToUTF32(char const* str, bool isFixedWidth /* =true
 {
     return isFixedWidth ? SimpleConversionImpl<std::u32string>(str) : ToUTF32(reinterpret_cast<unsigned char const*>(str));
 }
+
 static inline std::u32string ToUTF32(wchar_t const* str)
 {
     return SimpleConversionImpl<std::u32string>(str);
 }
+
 static inline std::u32string ToUTF32(unsigned char const* str)
 {
     return UTF8ToUTFXXImpl<std::u32string>(reinterpret_cast<char const*>(str), &mbrtoc32);
 }
+
 static inline std::u32string ToUTF32(char16_t const* str)
 {
     return ToUTF32(ToUTF8(str));
 }
+
 static inline std::u32string ToUTF32(char32_t const* str)
 {
     return SimpleConversionImpl<std::u32string>(str);
 }
+
 static inline std::u32string ToUTF32(std::string const& value, bool isFixedWidth /* =true */)
 {
     return ToUTF32(value.c_str(), isFixedWidth);
 }
+
 static inline std::u32string ToUTF32(std::wstring const& value)
 {
     return ToUTF32(value.c_str());
 }
+
 static inline std::u32string ToUTF32(std::vector<unsigned char> const& value)
 {
     return ToUTF32(value.data());
 }
+
 static inline std::u32string ToUTF32(std::u16string const& value)
 {
     return ToUTF32(value.c_str());
 }
 
-namespace
-{
+namespace {
 
 template <typename T> 
 std::string ToFixedString_WcharSize(T const* str, std::integral_constant<size_t, 4>)
@@ -565,6 +584,6 @@ static inline std::string ToLegacyString(std::vector<unsigned char> const& value
     return ToLegacyString(value.data());
 }
 
-}
-}
-}
+} // namespace CNTK
+} // namespace MSR
+} // namespace Microsoft
