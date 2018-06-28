@@ -89,6 +89,9 @@ void HTKMLFWriter<ElemType>::InitFromConfig(const ConfigRecordType& writerConfig
     {
         filelist.clear();
         std::wstring scriptPath = scriptpaths[i];
+
+        // TODO: The format specifier should probably be "%ls" here, but I'm not making that change as part of 
+        // this checkin as it is on the larger side and I want to limit its scope.
         fprintf(stderr, "HTKMLFWriter::Init: reading output script file %S ...", scriptPath.c_str());
         size_t n = 0;
         for (msra::files::textreader reader(scriptPath); reader && filelist.size() <= firstfilesonly /*optimization*/;)
