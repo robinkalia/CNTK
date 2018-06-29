@@ -1155,12 +1155,12 @@ WriteFormattingOptions::WriteFormattingOptions(const ConfigRecordType& config) :
         transpose = formatConfig(L"transpose", transpose);
         prologue  = formatConfig(L"prologue",  prologue);
         epilogue  = formatConfig(L"epilogue",  epilogue);
-        sequenceSeparator = Microsoft::MSR::CNTK::ToLegacyString(Microsoft::MSR::CNTK::ToUTF8(formatConfig(L"sequenceSeparator", Microsoft::MSR::CNTK::ToFixedWString(sequenceSeparator, false))));
-        sequencePrologue = Microsoft::MSR::CNTK::ToLegacyString(Microsoft::MSR::CNTK::ToUTF8(formatConfig(L"sequencePrologue", Microsoft::MSR::CNTK::ToFixedWString(sequencePrologue, false))));
-        sequenceEpilogue = Microsoft::MSR::CNTK::ToLegacyString(Microsoft::MSR::CNTK::ToUTF8(formatConfig(L"sequenceEpilogue", Microsoft::MSR::CNTK::ToFixedWString(sequenceEpilogue, false))));
-        elementSeparator = Microsoft::MSR::CNTK::ToLegacyString(Microsoft::MSR::CNTK::ToUTF8(formatConfig(L"elementSeparator", Microsoft::MSR::CNTK::ToFixedWString(elementSeparator, false))));
-        sampleSeparator = Microsoft::MSR::CNTK::ToLegacyString(Microsoft::MSR::CNTK::ToUTF8(formatConfig(L"sampleSeparator", Microsoft::MSR::CNTK::ToFixedWString(sampleSeparator, false))));
-        precisionFormat = Microsoft::MSR::CNTK::ToLegacyString(Microsoft::MSR::CNTK::ToUTF8(formatConfig(L"precisionFormat", Microsoft::MSR::CNTK::ToFixedWString(precisionFormat, false))));
+        sequenceSeparator = Microsoft::MSR::CNTK::ToLegacyString(Microsoft::MSR::CNTK::ToUTF8(formatConfig(L"sequenceSeparator", Microsoft::MSR::CNTK::ToFixedWStringFromMultiByte(sequenceSeparator))));
+        sequencePrologue = Microsoft::MSR::CNTK::ToLegacyString(Microsoft::MSR::CNTK::ToUTF8(formatConfig(L"sequencePrologue", Microsoft::MSR::CNTK::ToFixedWStringFromMultiByte(sequencePrologue))));
+        sequenceEpilogue = Microsoft::MSR::CNTK::ToLegacyString(Microsoft::MSR::CNTK::ToUTF8(formatConfig(L"sequenceEpilogue", Microsoft::MSR::CNTK::ToFixedWStringFromMultiByte(sequenceEpilogue))));
+        elementSeparator = Microsoft::MSR::CNTK::ToLegacyString(Microsoft::MSR::CNTK::ToUTF8(formatConfig(L"elementSeparator", Microsoft::MSR::CNTK::ToFixedWStringFromMultiByte(elementSeparator))));
+        sampleSeparator = Microsoft::MSR::CNTK::ToLegacyString(Microsoft::MSR::CNTK::ToUTF8(formatConfig(L"sampleSeparator", Microsoft::MSR::CNTK::ToFixedWStringFromMultiByte(sampleSeparator))));
+        precisionFormat = Microsoft::MSR::CNTK::ToLegacyString(Microsoft::MSR::CNTK::ToUTF8(formatConfig(L"precisionFormat", Microsoft::MSR::CNTK::ToFixedWStringFromMultiByte(precisionFormat))));
         // TODO: change those strings into wstrings to avoid this conversion mess
     }
 }

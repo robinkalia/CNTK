@@ -64,7 +64,7 @@ namespace CNTK
 
             filename << L"events.out.tfevents." 
                 << std::setfill(L'0') << std::setw(10) << time
-                     << L"." << ToFixedWString(GetHostName(), false);
+                     << L"." << ToFixedWStringFromMultiByte(GetHostName());
             return filename.str();
         }
 

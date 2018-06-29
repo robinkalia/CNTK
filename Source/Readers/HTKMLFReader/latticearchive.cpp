@@ -451,7 +451,7 @@ void lattice::dedup()
         const char *p = strchr(line, '=');
         if (p == NULL)
             RuntimeError("open: invalid TOC line (no = sign): %s", line);
-        const std::wstring key = Microsoft::MSR::CNTK::ToFixedWString(std::string(line, p - line), false);
+        const std::wstring key = Microsoft::MSR::CNTK::ToFixedWStringFromMultiByte(std::string(line, p - line));
 
         fprintf(stderr, "convert: processing lattice '%ls'\n", key.c_str());
 

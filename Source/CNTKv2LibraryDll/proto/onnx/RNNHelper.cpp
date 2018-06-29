@@ -524,7 +524,7 @@ FunctionPtr CreateLSTM(const LotusIR::Node *node, const std::vector<Variable> &i
     else
     {
         std::vector<Variable> operands({ outputHs[0], outputHs[1] });
-        return Splice(operands, Axis(0), ToFixedWString(node->Name(), false));
+        return Splice(operands, Axis(0), ToFixedWStringFromMultiByte(node->Name()));
     }
 }
 
@@ -583,7 +583,7 @@ FunctionPtr CreateGRU(const LotusIR::Node *node, const std::vector<Variable> &in
     else
     {
         std::vector<Variable> operands({ outputHs[0], outputHs[1] });
-        return Splice(operands, Axis(0), ToFixedWString(node->Name(), false));
+        return Splice(operands, Axis(0), ToFixedWStringFromMultiByte(node->Name()));
     }
 }
 
@@ -633,7 +633,7 @@ FunctionPtr CreateRNN(const LotusIR::Node *node, const std::vector<Variable> &in
     else
     {
         std::vector<Variable> operands({ outputHs[0], outputHs[1] });
-        return Splice(operands, Axis(0), ToFixedWString(node->Name(), false));
+        return Splice(operands, Axis(0), ToFixedWStringFromMultiByte(node->Name()));
     }
 }
 

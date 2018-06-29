@@ -66,7 +66,7 @@ void ONNXFormat::Save(const FunctionPtr& src, const std::wstring& filepath)
 #ifdef _WIN32
     LotusIR::Model::Save(*model, filepath);
 #else
-    LotusIR::Model::Save(*model, ToString(filepath));
+    LotusIR::Model::Save(*model, ToLegacyString(ToUTF8(filepath)));
 #endif
 }
 
@@ -77,7 +77,7 @@ FunctionPtr ONNXFormat::Load(const std::wstring& filepath, const DeviceDescripto
 #ifdef _WIN32
     Lotus::Common::Status loadStatus = LotusIR::Model::Load(filepath, model);
 #else
-    Lotus::Common::Status loadStatus = LotusIR::Model::Load(ToString(filepath), model);
+    Lotus::Common::Status loadStatus = LotusIR::Model::Load(ToLegacyString(ToUTF8(filepath)), model);
 #endif
     if (!loadStatus.IsOK())
         LogicError("Failed to load model: '%s'", loadStatus.ErrorMessage().c_str());

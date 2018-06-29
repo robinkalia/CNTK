@@ -472,7 +472,7 @@ public:
         // casting to wstring yields the logical path
         operator wstring() const
         {
-            return Microsoft::MSR::CNTK::ToFixedWString(logicalpath, false);
+            return Microsoft::MSR::CNTK::ToFixedWStringFromMultiByte(logicalpath);
         }
 
         // get duration in frames
@@ -923,9 +923,9 @@ class htkmlfreader : public map<wstring, vector<ENTRY>> // [key][i] the data
         if (filename.find("*/") == 0)
             filename = filename.substr(2);
 #ifdef _MSC_VER
-        wstring key = Microsoft::MSR::CNTK::ToFixedWString(regex_replace(filename, regex("\\.[^\\.\\\\/:]*$"), string()), false); // delete extension (or not if none)
+        wstring key = Microsoft::MSR::CNTK::ToFixedWStringFromMultiByte(regex_replace(filename, regex("\\.[^\\.\\\\/:]*$"), string())); // delete extension (or not if none)
 #else
-        wstring key = Microsoft::MSR::CNTK::ToFixedWString(msra::dbn::removeExtension(filename), false); // note that c++ 4.8 is incomplete for supporting regex
+        wstring key = Microsoft::MSR::CNTK::ToFixedWStringFromMultiByte(msra::dbn::removeExtension(filename)); // note that c++ 4.8 is incomplete for supporting regex
 #endif
 
         // determine lines range
