@@ -3,16 +3,17 @@
 // Licensed under the MIT license. See LICENSE.md file in the project root for full license information.
 //
 
-#include "ONNXToCNTK.h"
 #include "proto/onnx/core/graph/graph.h"
 #include "proto/onnx/core/graph/tensorutils.h"
+
 #include "Utils.h"
 #include "Operators.h"
 #include <algorithm>
 #include <iostream>
 #include "RNNHelper.h"
+#include "ONNXToCNTK.h"
 
-using namespace ONNXIR;
+using namespace LotusIR;
 using namespace CNTK;
 using namespace CNTK::ONNX;
 
@@ -269,7 +270,7 @@ CNTK::DataType ONNXToCNTKHelper::FromONNXType(onnx::TypeProto type)
     }
 }
 
-// helpers copied from ONNXIR (Converter.cc). These functions will eventually
+// helpers copied from LotusIR (Converter.cc). These functions will eventually
 // be replaced with functionalities of onnx core.
 bool IsLittleEndianOrder()
 {
@@ -431,7 +432,7 @@ Constant ONNXToCNTKHelper::CreateConstant(const onnx::TensorProto &valueProto, c
     {
         // It does not work using vector<bool> because resulted memory layout is not what we expect.
         bool *srcData = new bool[shape.TotalSize()];
-        ::ONNX::Utils::TensorUtils::UnpackTensor(valueProto, srcData, shape.TotalSize());
+        ::Lotus::Utils::TensorUtils::UnpackTensor(valueProto, srcData, shape.TotalSize());
 
         // CNTK does not support bool. We need to convert to float.
         std::vector<float> srcFloatData(shape.TotalSize());
@@ -446,7 +447,7 @@ Constant ONNXToCNTKHelper::CreateConstant(const onnx::TensorProto &valueProto, c
     case TensorProto_DataType_INT32:
     {
         std::vector<int32_t> srcData(shape.TotalSize());
-        ::ONNX::Utils::TensorUtils::UnpackTensor(valueProto, &srcData[0], shape.TotalSize());
+        ::Lotus::Utils::TensorUtils::UnpackTensor(valueProto, &srcData[0], shape.TotalSize());
 
         // CNTK does not support int. We need to convert to float.
         std::vector<float> srcFloatData(shape.TotalSize());
@@ -460,7 +461,7 @@ Constant ONNXToCNTKHelper::CreateConstant(const onnx::TensorProto &valueProto, c
     case TensorProto_DataType_INT64:
     {
         std::vector<int64_t> srcData(shape.TotalSize());
-        ::ONNX::Utils::TensorUtils::UnpackTensor(valueProto, &srcData[0], shape.TotalSize());
+        ::Lotus::Utils::TensorUtils::UnpackTensor(valueProto, &srcData[0], shape.TotalSize());
 
         // CNTK does not support int64_t. We need to convert to float.
         std::vector<float> srcFloatData(shape.TotalSize());
@@ -2021,7 +2022,7 @@ FunctionPtr ONNXToCNTKHelper::CreateFunction(const Node *node, const std::vector
     else if (onnxOpName == "AveragePool" || onnxOpName == "MaxPool")
     {
         NDShape poolingWindowShape = GetNamedAttributeAsShape(node, "kernel_shape", false);
-        NDShape strides = GetNamedAttributeAsShape(node, "strides", false);
+        NDShape strides = GetNamedAttributeAsShape(node, "strides", false, NDShape(std::vector<size_t>(poolingWindowShape.Rank(), 1u)));
 
         bool ceilOutDim = false;
         bool includePad = false;
@@ -2949,9 +2950,11 @@ FunctionPtr ONNXToCNTKHelper::CreateCNTKConvTransposeNode(const Node *node, cons
 {
     Variable inputOperand = inputs[0];
     Variable convolutionMap = inputs[1];
+    size_t numSpatialDim = convolutionMap.Shape().Rank() - 1; // This is conv op dimension, i.e. 2 for 2D conv, 3 for 3D conv.
 
-    NDShape strides = GetNamedAttributeAsShape(node, "strides", false);
-    NDShape dilation = GetNamedAttributeAsShape(node, "dilations", false, {1});
+    NDShape strides = GetNamedAttributeAsShape(node, "strides", false, NDShape(std::vector<size_t>(numSpatialDim, 1u)));
+    NDShape dilation = GetNamedAttributeAsShape(node, "dilations", false, NDShape(std::vector<size_t>(numSpatialDim, 1u)));
+
     std::vector<bool> sharing({true});
     size_t reductionRank = 1;
     size_t maxTempMemSizeInSamples = 0;
@@ -3005,18 +3008,20 @@ FunctionPtr ONNXToCNTKHelper::CreateCNTKConvTransposeNode(const Node *node, cons
 
 FunctionPtr ONNXToCNTKHelper::CreateCNTKConvNode(const Node *node, const std::vector<Variable> &inputs)
 {
-    NDShape strides = GetNamedAttributeAsShape(node, "strides", false);
-    NDShape dilation = GetNamedAttributeAsShape(node, "dilations", false, {1});
+    Variable convolutionMap = inputs[1];
+    size_t numSpatialDim = convolutionMap.Shape().Rank() - 1; // This is conv op dimension, i.e. 2 for 2D conv, 3 for 3D conv.
+
+    NDShape strides = GetNamedAttributeAsShape(node, "strides", false, NDShape(std::vector<size_t>(numSpatialDim, 1u)));
+    NDShape dilation = GetNamedAttributeAsShape(node, "dilations", false, NDShape(std::vector<size_t>(numSpatialDim, 1u)));
     // TODO: avoid hardcoded values
     std::vector<bool> sharing({true});
     size_t reductionRank = 1;
     size_t maxTempMemSizeInSamples = 0;
     size_t groups = GetNamedAttributeAsInt64(node, "group", 1);
 
-    Variable convolutionMap = inputs[1];
-
     std::vector<bool> cntkConvAutoPadding;
     auto convOperand = GetNodeOperandWithPaddingResolved(/*output arg first*/ cntkConvAutoPadding, strides, node, inputs);
+
     FunctionPtr cntkConvFunction = Convolution(
         convolutionMap,
         convOperand,
@@ -3056,7 +3061,7 @@ FunctionPtr ONNXToCNTKHelper::CreateCNTKFCNode(const std::wstring &nodeName, con
     return cntkFunction;
 }
 
-FunctionPtr ONNXToCNTK::CreateGraph(ONNXIR::Graph *src, const DeviceDescriptor &computeDevice)
+FunctionPtr ONNXToCNTK::CreateGraph(LotusIR::Graph *src, const DeviceDescriptor &computeDevice)
 {
     FunctionPtr cntkModel;
 
@@ -3087,7 +3092,7 @@ FunctionPtr ONNXToCNTK::CreateGraph(ONNXIR::Graph *src, const DeviceDescriptor &
     std::vector<FunctionPtr> functions;
     for (Node::NodeConstIterator it = itNodeFn->first->InputNodesBegin(); it != itNodeFn->first->InputNodesEnd(); ++it)
     {
-        // TODO: consulting ONNXIR to see how to do this solidly.
+        // TODO: consulting LotusIR to see how to do this solidly.
         // https://msasg.visualstudio.com/DefaultCollection/Shared%20Data/AIToolkits-CNTK/_queries?id=1134732&_a=edit&triage=true
         std::vector<FunctionPtr> &constructedFuncts = constructedFunctions[*it];
         for (int index = 0; index < constructedFuncts.size(); index++)
