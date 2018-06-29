@@ -350,7 +350,7 @@ void SGD<ElemType>::TrainOrAdaptModel(int startEpoch, ComputationNetworkPtr net,
         smoothedCounts.push_back(0);
         if (node->IsParameterUpdateRequired())
         {
-            nodesToUpdateDescriptions.push_back(node->NodeDescription() + L" : [" + Microsoft::MSR::CNTK::ToFixedWString(string(node->GetSampleLayout()), false) + L"]");
+            nodesToUpdateDescriptions.push_back(node->NodeDescription() + L" : [" + Microsoft::MSR::CNTK::ToFixedWStringFromMultiByte(string(node->GetSampleLayout())) + L"]");
             numParameters += node->GetSampleLayout().GetNumElements();
         }
     }

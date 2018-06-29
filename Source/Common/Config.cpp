@@ -63,7 +63,7 @@ std::string ConfigParameters::ParseCommandLine(int argc, wchar_t* argv[], Config
                     resolvedConfigFiles.push_back(filePath);
                     configString += config.ReadConfigFile(filePath);
                     // remember all config directories, for use as include paths by BrainScriptNetworkBuilder
-                    GetBrainScriptNetworkBuilderIncludePaths().push_back(File::DirectoryPathOf(Microsoft::MSR::CNTK::ToFixedWString(filePath, false)));
+                    GetBrainScriptNetworkBuilderIncludePaths().push_back(File::DirectoryPathOf(Microsoft::MSR::CNTK::ToFixedWStringFromMultiByte(filePath)));
                 }
                 else
                     RuntimeError("Cannot specify same config file multiple times at the command line.");
@@ -172,7 +172,7 @@ void ConfigParser::LoadConfigFile(const std::wstring& filePath)
 // Same as "ReadConfigFiles" function below, but takes as input string instead of wstring
 std::string ConfigParser::ReadConfigFiles(const std::string& filePaths)
 {
-    return ReadConfigFiles(Microsoft::MSR::CNTK::ToFixedWString(filePaths, false));
+    return ReadConfigFiles(Microsoft::MSR::CNTK::ToFixedWStringFromMultiByte(filePaths));
 }
 
 // ReadConfigFiles - reads multiple config files, concatenates the content from each file, and returns a string
@@ -192,7 +192,7 @@ std::string ConfigParser::ReadConfigFiles(const std::wstring& filePaths)
 // Same as "ReadConfigFile" function below, but takes as input string instead of wstring
 std::string ConfigParser::ReadConfigFile(const std::string& filePath)
 {
-    return ReadConfigFile(Microsoft::MSR::CNTK::ToFixedWString(filePath, false));
+    return ReadConfigFile(Microsoft::MSR::CNTK::ToFixedWStringFromMultiByte(filePath));
 }
 
 // ReadConfigFile - read a configuration file, and return all lines, stripped of comments, concatenated by newlines, as one long string (no other processing, expansion etc.)

@@ -158,7 +158,7 @@ public:
         }
 
         ComputationNetworkPtr cn = netNdl->cn;
-        wstring name = Microsoft::MSR::CNTK::ToFixedWString(search, false);
+        wstring name = Microsoft::MSR::CNTK::ToFixedWStringFromMultiByte(search);
         vector<ComputationNodeBasePtr> nodes = cn->GetNodesFromName(name);
         // didn't find the name in the current symbols, try NDL
         if (nodes.empty() && netNdl->ndl != nullptr)
@@ -218,7 +218,7 @@ public:
             search = symbolIn.substr(firstStart);
         }
 
-        wstring name = Microsoft::MSR::CNTK::ToFixedWString(search, false);
+        wstring name = Microsoft::MSR::CNTK::ToFixedWStringFromMultiByte(search);
         vector<ComputationNodeBasePtr> nodes = netNdlIn->cn->GetNodesFromName(name);
 
         if (!nodes.size()) // found
@@ -242,7 +242,7 @@ public:
             search = symbolOut.substr(firstStartOut);
         }
 
-        wstring nameOut = Microsoft::MSR::CNTK::ToFixedWString(search, false);
+        wstring nameOut = Microsoft::MSR::CNTK::ToFixedWStringFromMultiByte(search);
 
         bool singleInputMultiOutput = (outWildcard && !inWildcard);
 
@@ -255,8 +255,8 @@ public:
         }
 
         // get the first and last "unchanged" portions
-        std::wstring first = Microsoft::MSR::CNTK::ToFixedWString(symbolOut.substr(firstStartOut, firstCountOut), false);
-        std::wstring second = Microsoft::MSR::CNTK::ToFixedWString(symbolOut.substr(secondStartOut, secondCountOut), false);
+        std::wstring first = Microsoft::MSR::CNTK::ToFixedWStringFromMultiByte(symbolOut.substr(firstStartOut, firstCountOut));
+        std::wstring second = Microsoft::MSR::CNTK::ToFixedWStringFromMultiByte(symbolOut.substr(secondStartOut, secondCountOut));
 
         // now we have the original names from the input symbol, generate the output names
         vector<GenNameValue> ret;
@@ -375,7 +375,7 @@ public:
             ProcessNDLScript(netNdlTo, ndlPassAll);
         }
 
-        std::wstring toNamePrefixW = Microsoft::MSR::CNTK::ToFixedWString(toNamePrefix, false);
+        std::wstring toNamePrefixW = Microsoft::MSR::CNTK::ToFixedWStringFromMultiByte(toNamePrefix);
 
         // now we have the original names from the input symbol, generate the output names
         for (int i = 0; i < fromNodes.size(); i++)

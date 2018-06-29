@@ -558,7 +558,7 @@ public:
 template <class C>
 static wstring TypeId()
 {
-    return Microsoft::MSR::CNTK::ToFixedWString(typeid(C).name(), false);
+    return Microsoft::MSR::CNTK::ToFixedWStringFromMultiByte(typeid(C).name());
 }
 
 // ----------------------------------------------------------------------------
@@ -577,7 +577,7 @@ public:
     }
     FARPROC Load(const std::string& plugin, const std::string& proc, bool isCNTKPlugin = true)
     {
-        return LoadInternal(Microsoft::MSR::CNTK::ToFixedWString(plugin, false), proc, isCNTKPlugin);
+        return LoadInternal(Microsoft::MSR::CNTK::ToFixedWStringFromMultiByte(plugin), proc, isCNTKPlugin);
     }
     FARPROC Load(const std::wstring& plugin, const std::string& proc, bool isCNTKPlugin = true)
     {

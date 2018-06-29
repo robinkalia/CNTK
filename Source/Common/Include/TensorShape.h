@@ -774,7 +774,7 @@ public:
     // pretty-printing, wstring version 
     operator std::wstring() const
     {
-        return Microsoft::MSR::CNTK::ToFixedWString(this->operator std::string(), false);
+        return Microsoft::MSR::CNTK::ToFixedWStringFromMultiByte(this->operator std::string());
     }
 
 private:

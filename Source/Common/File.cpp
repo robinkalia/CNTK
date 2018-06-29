@@ -49,7 +49,7 @@ File::File(const std::wstring& filename, int fileOptions)
 File::File(const std::string& filename, int fileOptions)
 {
     // this converts from string to wstring, and then to wchar_t*
-    Init(Microsoft::MSR::CNTK::ToFixedWString(filename, false).c_str(), fileOptions);
+    Init(Microsoft::MSR::CNTK::ToFixedWStringFromMultiByte(filename).c_str(), fileOptions);
 }
 
 File::File(const wchar_t* filename, int fileOptions)
@@ -244,7 +244,7 @@ void File::Init(const wchar_t* filename, int fileOptions)
     if (readlink(path, dest, PATH_MAX) == -1)
         RuntimeError("GetExecutableDirectory: readlink() call failed.");
     else
-        return Microsoft::MSR::CNTK::ToFixedWString(dest, false);
+        return Microsoft::MSR::CNTK::ToFixedWStringFromMultiByte(dest);
 #endif
 }
 
@@ -348,7 +348,7 @@ void File::GetLine(string& str)
 static void PushBackString(vector<string>& lines,  const string& s) { lines.push_back(s); }
 static void PushBackString(vector<wstring>& lines, string& s)
 {
-    lines.push_back(Microsoft::MSR::CNTK::ToFixedWString(s, false));
+    lines.push_back(Microsoft::MSR::CNTK::ToFixedWStringFromMultiByte(s));
 }
 
 // GetLines - get all lines from a file
@@ -1042,7 +1042,7 @@ FARPROC Plugin::LoadInternal(const std::wstring& plugin, const std::string& proc
             auto entry = s_deprecatedReaderWriterNameMap.find(m_dllName);
             if (entry != s_deprecatedReaderWriterNameMap.end())
                 m_dllName = entry->second;
-            m_dllName += L"-" + Microsoft::MSR::CNTK::ToFixedWString(CNTK_COMPONENT_VERSION, false);
+            m_dllName += L"-" + Microsoft::MSR::CNTK::ToFixedWStringFromMultiByte(CNTK_COMPONENT_VERSION);
         }
 
         m_dllName += L".dll";
@@ -1068,7 +1068,7 @@ FARPROC Plugin::LoadInternal(const std::wstring& plugin, const std::string& proc
 void* Plugin::LoadInternal(const std::string& plugin, const std::string& proc, bool isCNTKPlugin)
 {
     string soName = plugin;
-    wstring soNameW = Microsoft::MSR::CNTK::ToFixedWString(plugin, false);
+    wstring soNameW = Microsoft::MSR::CNTK::ToFixedWStringFromMultiByte(plugin);
 
     if (!boost::ends_with(soName, ".so"))
     {

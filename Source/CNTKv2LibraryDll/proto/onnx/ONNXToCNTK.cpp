@@ -586,7 +586,7 @@ const CNTK::Constant CNTK::ONNXToCNTKHelper::CreateConstantWithTensorData(CNTK::
 
     if (computeDevice.Type() == DeviceKind::CPU)
     {
-        Constant constantVariable(dstFinal, ToFixedWString(nodeName, false));
+        Constant constantVariable(dstFinal, ToFixedWStringFromMultiByte(nodeName));
         return constantVariable;
     }
     else
@@ -595,7 +595,7 @@ const CNTK::Constant CNTK::ONNXToCNTKHelper::CreateConstantWithTensorData(CNTK::
         // Create a GPU NDArrayView and CopyFrom a CPU NDArrayView that holding the data.
         NDArrayViewPtr dstFinalGPU(new NDArrayView(cntkDataType, StorageFormat::Dense, reversedShape, computeDevice));
         dstFinalGPU->CopyFrom(*dstFinal);
-        Constant constantVariable(dstFinalGPU, ToFixedWString(nodeName, false));
+        Constant constantVariable(dstFinalGPU, ToFixedWStringFromMultiByte(nodeName));
         return constantVariable;
     }
 }
@@ -707,7 +707,7 @@ Constant CreateConstantWithRawData(DType *data, const NDShape &shape, const std:
 
     if (computeDevice.Type() == DeviceKind::CPU)
     {
-        Constant constantVariable(dstFinal, ToFixedWString(name, false));
+        Constant constantVariable(dstFinal, ToFixedWStringFromMultiByte(name));
         return constantVariable;
     }
     else
@@ -716,7 +716,7 @@ Constant CreateConstantWithRawData(DType *data, const NDShape &shape, const std:
         // Create a GPU NDArrayView and CopyFrom a CPU NDArrayView that holding the data.
         NDArrayViewPtr dstFinalGPU(new NDArrayView(dataType, StorageFormat::Dense, shape, computeDevice));
         dstFinalGPU->CopyFrom(*dstFinal);
-        Constant constantVariable(dstFinalGPU, ToFixedWString(name, false));
+        Constant constantVariable(dstFinalGPU, ToFixedWStringFromMultiByte(name));
         return constantVariable;
     }
 }
@@ -1261,7 +1261,7 @@ std::vector<Variable> ONNXToCNTKHelper::CreateRNNLeafVariableOrConstant(const No
                     DataType dataType = FromONNXType(nodeArg->ToProto().type());
                     int input_size = shapeProto->dim(2).dim_value();
                     NDShape shape({(size_t)(input_size)});
-                    inputVariable = InputVariable(shape, dataType, ToFixedWString(nodeArg->Name(), false), dynamicAxes);
+                    inputVariable = InputVariable(shape, dataType, ToFixedWStringFromMultiByte(nodeArg->Name()), dynamicAxes);
                     constructedNodeArgVariableMap.insert(ONNXToCNTKVariableMap::value_type(nodeArg->Name(), inputVariable));
                 }
                 return std::vector<Variable>({constructedNodeArgVariableMap[nodeArg->Name()]});
@@ -1293,7 +1293,7 @@ std::vector<Variable> ONNXToCNTKHelper::CreateRNNLeafVariableOrConstant(const No
                     DataType dataType = FromONNXType(nodeArg->ToProto().type());
                     int input_size = shapeProto->dim(2).dim_value();
                     NDShape shape({(size_t)(input_size)});
-                    inputVariable = InputVariable(shape, dataType, ToFixedWString(nodeArg->Name(), false), dynamicAxes);
+                    inputVariable = InputVariable(shape, dataType, ToFixedWStringFromMultiByte(nodeArg->Name()), dynamicAxes);
                     constructedNodeArgVariableMap.insert(ONNXToCNTKVariableMap::value_type(nodeArg->Name(), inputVariable));
                 }
                 return std::vector<Variable>({constructedNodeArgVariableMap[nodeArg->Name()]});
@@ -1323,7 +1323,7 @@ std::vector<Variable> ONNXToCNTKHelper::CreateRNNLeafVariableOrConstant(const No
                     DataType dataType = FromONNXType(nodeArg->ToProto().type());
                     int input_size = shapeProto->dim(2).dim_value();
                     NDShape shape({(size_t)(input_size)});
-                    inputVariable = InputVariable(shape, dataType, ToFixedWString(nodeArg->Name(), false), dynamicAxes);
+                    inputVariable = InputVariable(shape, dataType, ToFixedWStringFromMultiByte(nodeArg->Name()), dynamicAxes);
                     constructedNodeArgVariableMap.insert(ONNXToCNTKVariableMap::value_type(nodeArg->Name(), inputVariable));
                 }
                 return std::vector<Variable>({constructedNodeArgVariableMap[nodeArg->Name()]});
@@ -1389,15 +1389,15 @@ Variable ONNXToCNTKHelper::CreateLeafVariableOrConstant(const NodeArg *nodeArg,
     {
     case CNTK::DataType::Float:
     {
-        return InputVariable(shape, CNTK::DataType::Float, ToFixedWString(nodeArg->Name(), false), dynamicAxes);
+        return InputVariable(shape, CNTK::DataType::Float, ToFixedWStringFromMultiByte(nodeArg->Name()), dynamicAxes);
     }
     case CNTK::DataType::Float16:
     {
-        return InputVariable(shape, CNTK::DataType::Float16, ToFixedWString(nodeArg->Name(), false), dynamicAxes);
+        return InputVariable(shape, CNTK::DataType::Float16, ToFixedWStringFromMultiByte(nodeArg->Name()), dynamicAxes);
     }
     case CNTK::DataType::Double:
     {
-        return InputVariable(shape, CNTK::DataType::Double, ToFixedWString(nodeArg->Name(), false), dynamicAxes);
+        return InputVariable(shape, CNTK::DataType::Double, ToFixedWStringFromMultiByte(nodeArg->Name()), dynamicAxes);
     }
     default:
         NOT_IMPLEMENTED;
@@ -1957,33 +1957,33 @@ FunctionPtr ONNXToCNTKHelper::CreateFunction(const Node *node, const std::vector
     }
     if (onnxOpName == "FC")
     {
-        return CreateCNTKFCNode(ToFixedWString(node->Name(), false), inputs);
+        return CreateCNTKFCNode(ToFixedWStringFromMultiByte(node->Name()), inputs);
     }
     else if (onnxOpName == "Flatten")
     {
         int64_t axisIndex = (size_t) GetNamedAttributeAsInt64(node, "axis", 0);
         Axis axis = ConvertONNXAxisToCNTKCppApi(axisIndex, inputs[0]);
-        FunctionPtr cntkFunction = Flatten(inputs[0], axis, ToFixedWString(node->Name(), false));
+        FunctionPtr cntkFunction = Flatten(inputs[0], axis, ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "Equal")
     {
-        FunctionPtr cntkFunction = Equal(inputs[0], inputs[1], ToFixedWString(node->Name(), false));
+        FunctionPtr cntkFunction = Equal(inputs[0], inputs[1], ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "Greater")
     {
-        FunctionPtr cntkFunction = Greater(inputs[0], inputs[1], ToFixedWString(node->Name(), false));
+        FunctionPtr cntkFunction = Greater(inputs[0], inputs[1], ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "Less")
     {
-        FunctionPtr cntkFunction = Less(inputs[0], inputs[1], ToFixedWString(node->Name(), false));
+        FunctionPtr cntkFunction = Less(inputs[0], inputs[1], ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "Mean")
     {
-        FunctionPtr cntkFunction = Mean(inputs, ToFixedWString(node->Name(), false));
+        FunctionPtr cntkFunction = Mean(inputs, ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "Clip")
@@ -1992,7 +1992,7 @@ FunctionPtr ONNXToCNTKHelper::CreateFunction(const Node *node, const std::vector
         double maxValue = GetNamedAttributeAsFloat(node, "max");
         Constant minVariable = Constant::Scalar(CNTK::DataType::Float, minValue);
         Constant maxVariable = Constant::Scalar(CNTK::DataType::Float, maxValue);
-        FunctionPtr cntkFunction = Clip(inputs[0], minVariable, maxVariable, ToFixedWString(node->Name(), false));
+        FunctionPtr cntkFunction = Clip(inputs[0], minVariable, maxVariable, ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "Sum")
@@ -2004,14 +2004,14 @@ FunctionPtr ONNXToCNTKHelper::CreateFunction(const Node *node, const std::vector
         {
             cntkFunction = Plus(cntkFunction, inputs[i]);
         }
-        cntkFunction->SetName(ToFixedWString(node->Name(), false));
+        cntkFunction->SetName(ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "HardSigmoid")
     {
         float alpha = GetNamedAttributeAsFloat(node, "alpha");
         float beta = GetNamedAttributeAsFloat(node, "beta");
-        FunctionPtr cntkFunction = HardSigmoid(inputs[0], alpha, beta, ToFixedWString(node->Name(), false));
+        FunctionPtr cntkFunction = HardSigmoid(inputs[0], alpha, beta, ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "LRN")
@@ -2023,7 +2023,7 @@ FunctionPtr ONNXToCNTKHelper::CreateFunction(const Node *node, const std::vector
         double alpha = GetNamedAttributeAsFloat(node, "alpha");
         double beta = GetNamedAttributeAsFloat(node, "beta");
         FunctionPtr cntkFunction = LocalResponseNormalization(inputs[0],
-                                                              depthRadius, bias, alpha, beta, ToFixedWString(node->Name(), false));
+                                                              depthRadius, bias, alpha, beta, ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "AveragePool" || onnxOpName == "MaxPool")
@@ -2040,7 +2040,7 @@ FunctionPtr ONNXToCNTKHelper::CreateFunction(const Node *node, const std::vector
 
         FunctionPtr cntkFunction = Pooling(poolingOperand,
                                            onnxOpName == "AveragePool" ? PoolingType::Average : PoolingType::Max,
-                                           poolingWindowShape, strides, cntkPoolingAutoPadding, ceilOutDim, includePad, ToFixedWString(node->Name(), false));
+                                           poolingWindowShape, strides, cntkPoolingAutoPadding, ceilOutDim, includePad, ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "GlobalAveragePool" || onnxOpName == "GlobalMaxPool")
@@ -2052,7 +2052,7 @@ FunctionPtr ONNXToCNTKHelper::CreateFunction(const Node *node, const std::vector
 
         FunctionPtr cntkFunction = Pooling(inputs[0],
                                            onnxOpName == "GlobalAveragePool" ? PoolingType::Average : PoolingType::Max,
-                                           NDShape::Unknown(), strides, autoPadding, ceilOutDim, includePad, ToFixedWString(node->Name(), false));
+                                           NDShape::Unknown(), strides, autoPadding, ceilOutDim, includePad, ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "MaxRoiPool")
@@ -2064,7 +2064,7 @@ FunctionPtr ONNXToCNTKHelper::CreateFunction(const Node *node, const std::vector
 
         float spatialScale = GetNamedAttributeAsFloat(node, "spatial_scale");
         FunctionPtr cntkFunction = ROIPooling(inputs[0], inputs[1],
-                                              PoolingType::Max, roiOutputShape, spatialScale, ToFixedWString(node->Name(), false));
+                                              PoolingType::Max, roiOutputShape, spatialScale, ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "Conv")
@@ -2125,7 +2125,7 @@ FunctionPtr ONNXToCNTKHelper::CreateFunction(const Node *node, const std::vector
                                                       epsilon,
                                                       useCuDNNEngine,
                                                       disableRegularization,
-                                                      ToFixedWString(node->Name(), false));
+                                                      ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "Gemm")
@@ -2152,7 +2152,7 @@ FunctionPtr ONNXToCNTKHelper::CreateFunction(const Node *node, const std::vector
         FunctionPtr C = ElementTimes(input2, Constant(NDShape({1, 1}), CNTK::DataType::Float, static_cast<double>(beta)));
         if (!transA && transB && broadcast) // Special case: Equivalent to FC (fully-connected) op. Takes in account broadcast of B, if needed.
         {
-            return CreateCNTKFCNode(ToFixedWString(node->Name(), false), {(Variable) A, input1, (Variable) C});
+            return CreateCNTKFCNode(ToFixedWStringFromMultiByte(node->Name()), {(Variable) A, input1, (Variable) C});
         }
         FunctionPtr B = (transB != 0) ? Transpose(input1) : (FunctionPtr) input1;
         FunctionPtr D = (transA != 0) ? Times(B, Transpose(A)) : Times(B, A);
@@ -2165,7 +2165,7 @@ FunctionPtr ONNXToCNTKHelper::CreateFunction(const Node *node, const std::vector
         double dropoutRate = GetNamedAttributeAsFloat(node, "ratio");
 
         unsigned long seed = SentinelValueForAutoSelectRandomSeed;
-        FunctionPtr cntkFunction = Dropout(operand, dropoutRate, seed, ToFixedWString(node->Name(), false));
+        FunctionPtr cntkFunction = Dropout(operand, dropoutRate, seed, ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "RandomUniform")
@@ -2178,7 +2178,7 @@ FunctionPtr ONNXToCNTKHelper::CreateFunction(const Node *node, const std::vector
         double low = GetNamedAttributeAsFloat(node, "low");
         double high = GetNamedAttributeAsFloat(node, "high");
         unsigned long seed = GetNamedAttributeAsInt64(node, "seed");
-        FunctionPtr cntkFunction = UniformRandom(shape, dataType, low, high, seed, ToFixedWString(node->Name(), false));
+        FunctionPtr cntkFunction = UniformRandom(shape, dataType, low, high, seed, ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "RandomNormal")
@@ -2188,7 +2188,7 @@ FunctionPtr ONNXToCNTKHelper::CreateFunction(const Node *node, const std::vector
         double mean = GetNamedAttributeAsFloat(node, "mean");
         double scale = GetNamedAttributeAsFloat(node, "scale");
         unsigned long seed = GetNamedAttributeAsInt64(node, "seed");
-        FunctionPtr cntkFunction = NormalRandom(shape, dataType, mean, scale, seed, ToFixedWString(node->Name(), false));
+        FunctionPtr cntkFunction = NormalRandom(shape, dataType, mean, scale, seed, ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "RandomUniformLike")
@@ -2197,7 +2197,7 @@ FunctionPtr ONNXToCNTKHelper::CreateFunction(const Node *node, const std::vector
         double low = GetNamedAttributeAsFloat(node, "low");
         double high = GetNamedAttributeAsFloat(node, "high");
         unsigned long seed = GetNamedAttributeAsInt64(node, "seed");
-        FunctionPtr cntkFunction = UniformRandomLike(operand, low, high, seed, ToFixedWString(node->Name(), false));
+        FunctionPtr cntkFunction = UniformRandomLike(operand, low, high, seed, ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "RandomNormalLike")
@@ -2206,160 +2206,160 @@ FunctionPtr ONNXToCNTKHelper::CreateFunction(const Node *node, const std::vector
         double mean = GetNamedAttributeAsFloat(node, "mean");
         double scale = GetNamedAttributeAsFloat(node, "scale");
         unsigned long seed = GetNamedAttributeAsInt64(node, "seed");
-        FunctionPtr cntkFunction = NormalRandomLike(operand, mean, scale, seed, ToFixedWString(node->Name(), false));
+        FunctionPtr cntkFunction = NormalRandomLike(operand, mean, scale, seed, ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "Add")
     {
         Variable input0, input1;
         std::tie<Variable, Variable>(input0, input1) = BroadcastElementWiseInput(node, inputs[0], inputs[1]);
-        FunctionPtr cntkFunction = Plus(input0, input1, ToFixedWString(node->Name(), false));
+        FunctionPtr cntkFunction = Plus(input0, input1, ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "Sub")
     {
         Variable input0, input1;
         std::tie<Variable, Variable>(input0, input1) = BroadcastElementWiseInput(node, inputs[0], inputs[1]);
-        FunctionPtr cntkFunction = Minus(input0, input1, ToFixedWString(node->Name(), false));
+        FunctionPtr cntkFunction = Minus(input0, input1, ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "Mul")
     {
         Variable input0, input1;
         std::tie<Variable, Variable>(input0, input1) = BroadcastElementWiseInput(node, inputs[0], inputs[1]);
-        FunctionPtr cntkFunction = ElementTimes(input0, input1, ToFixedWString(node->Name(), false));
+        FunctionPtr cntkFunction = ElementTimes(input0, input1, ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "Div")
     {
         Variable input0, input1;
         std::tie<Variable, Variable>(input0, input1) = BroadcastElementWiseInput(node, inputs[0], inputs[1]);
-        FunctionPtr cntkFunction = ElementDivide(input0, input1, ToFixedWString(node->Name(), false));
+        FunctionPtr cntkFunction = ElementDivide(input0, input1, ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "And")
     {
         Variable input0, input1;
         std::tie<Variable, Variable>(input0, input1) = BroadcastElementWiseInput(node, inputs[0], inputs[1]);
-        FunctionPtr cntkFunction = ElementAnd(input0, input1, ToFixedWString(node->Name(), false));
+        FunctionPtr cntkFunction = ElementAnd(input0, input1, ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "Not")
     {
-        FunctionPtr cntkFunction = ElementNot(inputs[0], ToFixedWString(node->Name(), false));
+        FunctionPtr cntkFunction = ElementNot(inputs[0], ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "Or")
     {
         Variable input0, input1;
         std::tie<Variable, Variable>(input0, input1) = BroadcastElementWiseInput(node, inputs[0], inputs[1]);
-        FunctionPtr cntkFunction = ElementOr(input0, input1, ToFixedWString(node->Name(), false));
+        FunctionPtr cntkFunction = ElementOr(input0, input1, ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "Xor")
     {
         Variable input0, input1;
         std::tie<Variable, Variable>(input0, input1) = BroadcastElementWiseInput(node, inputs[0], inputs[1]);
-        FunctionPtr cntkFunction = ElementXor(input0, input1, ToFixedWString(node->Name(), false));
+        FunctionPtr cntkFunction = ElementXor(input0, input1, ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "Neg")
     {
-        FunctionPtr cntkFunction = Negate(inputs[0], ToFixedWString(node->Name(), false));
+        FunctionPtr cntkFunction = Negate(inputs[0], ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "Abs")
     {
-        FunctionPtr cntkFunction = Abs(inputs[0], ToFixedWString(node->Name(), false));
+        FunctionPtr cntkFunction = Abs(inputs[0], ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "Reciprocal")
     {
-        FunctionPtr cntkFunction = Reciprocal(inputs[0], ToFixedWString(node->Name(), false));
+        FunctionPtr cntkFunction = Reciprocal(inputs[0], ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "Floor")
     {
-        FunctionPtr cntkFunction = Floor(inputs[0], ToFixedWString(node->Name(), false));
+        FunctionPtr cntkFunction = Floor(inputs[0], ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "Ceil")
     {
-        FunctionPtr cntkFunction = Ceil(inputs[0], ToFixedWString(node->Name(), false));
+        FunctionPtr cntkFunction = Ceil(inputs[0], ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "Sqrt")
     {
-        FunctionPtr cntkFunction = Sqrt(inputs[0], ToFixedWString(node->Name(), false));
+        FunctionPtr cntkFunction = Sqrt(inputs[0], ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "Relu")
     {
-        FunctionPtr cntkFunction = ReLU(inputs[0], ToFixedWString(node->Name(), false));
+        FunctionPtr cntkFunction = ReLU(inputs[0], ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "LeakyRelu")
     {
         double alpha = static_cast<double>(GetNamedAttributeAsFloat(node, "alpha", 0.01F));
-        FunctionPtr cntkFunction = LeakyReLU(inputs[0], alpha, ToFixedWString(node->Name(), false));
+        FunctionPtr cntkFunction = LeakyReLU(inputs[0], alpha, ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "Selu")
     {
         double alpha = static_cast<double>(GetNamedAttributeAsFloat(node, "alpha", 1.6732F));
         double gamma = static_cast<double>(GetNamedAttributeAsFloat(node, "gamma", 1.0507F));
-        FunctionPtr cntkFunction = SELU(inputs[0], gamma, alpha, ToFixedWString(node->Name(), false));
+        FunctionPtr cntkFunction = SELU(inputs[0], gamma, alpha, ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "Elu")
     {
         double alpha = static_cast<double>(GetNamedAttributeAsFloat(node, "alpha", 1.0f));
-        FunctionPtr cntkFunction = ELU(inputs[0], alpha, ToWString(node->Name()));
+        FunctionPtr cntkFunction = ELU(inputs[0], alpha, ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "Exp")
     {
-        FunctionPtr cntkFunction = Exp(inputs[0], ToFixedWString(node->Name(), false));
+        FunctionPtr cntkFunction = Exp(inputs[0], ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "Log")
     {
-        FunctionPtr cntkFunction = Log(inputs[0], ToFixedWString(node->Name(), false));
+        FunctionPtr cntkFunction = Log(inputs[0], ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "Tanh")
     {
-        FunctionPtr cntkFunction = Tanh(inputs[0], ToFixedWString(node->Name(), false));
+        FunctionPtr cntkFunction = Tanh(inputs[0], ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "Pow")
     {
-        FunctionPtr cntkFunction = Pow(inputs[0], inputs[1], ToFixedWString(node->Name(), false));
+        FunctionPtr cntkFunction = Pow(inputs[0], inputs[1], ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "MatMul")
     {
-        FunctionPtr cntkFunction = Times(inputs[1], inputs[0], ToFixedWString(node->Name(), false));
+        FunctionPtr cntkFunction = Times(inputs[1], inputs[0], ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "PRelu")
     {
-        FunctionPtr cntkFunction = PReLU(inputs[1], inputs[0], ToFixedWString(node->Name(), false));
+        FunctionPtr cntkFunction = PReLU(inputs[1], inputs[0], ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "Sigmoid")
     {
-        FunctionPtr cntkFunction = Sigmoid(inputs[0], ToFixedWString(node->Name(), false));
+        FunctionPtr cntkFunction = Sigmoid(inputs[0], ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "Max")
     {
-        FunctionPtr cntkFunction = ElementMax(inputs[0], inputs[1], ToFixedWString(node->Name(), false));
+        FunctionPtr cntkFunction = ElementMax(inputs[0], inputs[1], ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "Min")
     {
-        FunctionPtr cntkFunction = ElementMin(inputs[0], inputs[1], ToFixedWString(node->Name(), false));
+        FunctionPtr cntkFunction = ElementMin(inputs[0], inputs[1], ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "Sum")
@@ -2373,12 +2373,12 @@ FunctionPtr ONNXToCNTKHelper::CreateFunction(const Node *node, const std::vector
         {
             // onnx spec requires the first axis being batch axis for Hardmax op
             Variable input = Reshape(inputs[0], inputs[0].Shape().SubShape(0, inputs[0].Shape().Rank() - 1));
-            FunctionPtr cntkFunction = Hardmax(input, ToFixedWString(node->Name(), false));
+            FunctionPtr cntkFunction = Hardmax(input, ToFixedWStringFromMultiByte(node->Name()));
             return cntkFunction;
         }
         else
         {
-            FunctionPtr cntkFunction = Hardmax(inputs[0], ToFixedWString(node->Name(), false));
+            FunctionPtr cntkFunction = Hardmax(inputs[0], ToFixedWStringFromMultiByte(node->Name()));
             return cntkFunction;
         }
     }
@@ -2386,14 +2386,14 @@ FunctionPtr ONNXToCNTKHelper::CreateFunction(const Node *node, const std::vector
     {
         if (!HasNamedAttribute(node, "axis"))
         {
-            FunctionPtr cntkFunction = Softmax(inputs[0], ToFixedWString(node->Name(), false));
+            FunctionPtr cntkFunction = Softmax(inputs[0], ToFixedWStringFromMultiByte(node->Name()));
             return cntkFunction;
         }
         else
         {
             int index = static_cast<int>(GetNamedAttributeAsInt64(node, "axis", 0));
             Axis axis(index - 1);
-            FunctionPtr cntkFunction = Softmax(inputs[0], axis, ToFixedWString(node->Name(), false));
+            FunctionPtr cntkFunction = Softmax(inputs[0], axis, ToFixedWStringFromMultiByte(node->Name()));
             return cntkFunction;
         }
     }
@@ -2411,74 +2411,74 @@ FunctionPtr ONNXToCNTKHelper::CreateFunction(const Node *node, const std::vector
             axis = Axis(index - 1);
         }
 
-        FunctionPtr cntkFunction = LogSoftmax(inputs[0], axis, ToFixedWString(node->Name(), false));
+        FunctionPtr cntkFunction = LogSoftmax(inputs[0], axis, ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "Softplus")
     {
-        FunctionPtr cntkFunction = Softplus(inputs[0], ToFixedWString(node->Name(), false));
+        FunctionPtr cntkFunction = Softplus(inputs[0], ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "Softsign")
     {
-        FunctionPtr cntkFunction = Softsign(inputs[0], ToFixedWString(node->Name(), false));
+        FunctionPtr cntkFunction = Softsign(inputs[0], ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "ReduceMax")
     {
         std::vector<Axis> axes = ConvertONNXAxesToCNTKCppApi(GetNamedAttributeAsInt64Vec(node, "axes"), inputs[0]);
-        FunctionPtr cntkFunction = ReduceMax(inputs[0], axes[0], ToFixedWString(node->Name(), false));
+        FunctionPtr cntkFunction = ReduceMax(inputs[0], axes[0], ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "ReduceMin")
     {
         std::vector<Axis> axes = ConvertONNXAxesToCNTKCppApi(GetNamedAttributeAsInt64Vec(node, "axes"), inputs[0]);
-        FunctionPtr cntkFunction = ReduceMin(inputs[0], axes[0], ToFixedWString(node->Name(), false));
+        FunctionPtr cntkFunction = ReduceMin(inputs[0], axes[0], ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "ReduceSum")
     {
         std::vector<Axis> axes = ConvertONNXAxesToCNTKCppApi(GetNamedAttributeAsInt64Vec(node, "axes"), inputs[0]);
-        FunctionPtr cntkFunction = ReduceSum(inputs[0], axes[0], ToFixedWString(node->Name(), false));
+        FunctionPtr cntkFunction = ReduceSum(inputs[0], axes[0], ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "ReduceMean")
     {
         std::vector<Axis> axes = ConvertONNXAxesToCNTKCppApi(GetNamedAttributeAsInt64Vec(node, "axes"), inputs[0]);
-        FunctionPtr cntkFunction = ReduceMean(inputs[0], axes[0], ToFixedWString(node->Name(), false));
+        FunctionPtr cntkFunction = ReduceMean(inputs[0], axes[0], ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "ReduceProd")
     {
         std::vector<Axis> axes = ConvertONNXAxesToCNTKCppApi(GetNamedAttributeAsInt64Vec(node, "axes"), inputs[0]);
-        FunctionPtr cntkFunction = ReduceProd(inputs[0], axes[0], ToFixedWString(node->Name(), false));
+        FunctionPtr cntkFunction = ReduceProd(inputs[0], axes[0], ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "ReduceLogSumExp")
     {
         std::vector<Axis> axes = ConvertONNXAxesToCNTKCppApi(GetNamedAttributeAsInt64Vec(node, "axes"), inputs[0]);
-        FunctionPtr cntkFunction = ReduceLogSum(inputs[0], axes[0], ToFixedWString(node->Name(), false));
+        FunctionPtr cntkFunction = ReduceLogSum(inputs[0], axes[0], ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "ReduceL1")
     {
         std::vector<Axis> axes = ConvertONNXAxesToCNTKCppApi(GetNamedAttributeAsInt64Vec(node, "axes"), inputs[0]);
         bool keepdims = GetNamedAttributeAsInt64(node, "keepdims", 1) == 1;
-        FunctionPtr cntkFunction = ReduceL1(inputs[0], axes, keepdims, ToFixedWString(node->Name(), false));
+        FunctionPtr cntkFunction = ReduceL1(inputs[0], axes, keepdims, ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "ReduceL2")
     {
         std::vector<Axis> axes = ConvertONNXAxesToCNTKCppApi(GetNamedAttributeAsInt64Vec(node, "axes"), inputs[0]);
         bool keepdims = GetNamedAttributeAsInt64(node, "keepdims", 1) == 1;
-        FunctionPtr cntkFunction = ReduceL2(inputs[0], axes, keepdims, ToFixedWString(node->Name(), false));
+        FunctionPtr cntkFunction = ReduceL2(inputs[0], axes, keepdims, ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "ReduceSumSquare")
     {
         std::vector<Axis> axes = ConvertONNXAxesToCNTKCppApi(GetNamedAttributeAsInt64Vec(node, "axes"), inputs[0]);
         bool keepdims = GetNamedAttributeAsInt64(node, "keepdims", 1) == 1;
-        FunctionPtr cntkFunction = ReduceSumSquare(inputs[0], axes, keepdims, ToFixedWString(node->Name(), false));
+        FunctionPtr cntkFunction = ReduceSumSquare(inputs[0], axes, keepdims, ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "ArgMax")
@@ -2486,14 +2486,14 @@ FunctionPtr ONNXToCNTKHelper::CreateFunction(const Node *node, const std::vector
         int64_t axisIndex = GetNamedAttributeAsInt64(node, "axis");
         // -1 to compensate what ConvertAxisToCNTKCppApi assumes that axis is already decreased by 1
         Axis axis = ConvertONNXAxisToCNTKCppApi(axisIndex, inputs[0]);
-        FunctionPtr cntkfunction = Argmax(inputs[0], axis, ToFixedWString(node->Name(), false));
+        FunctionPtr cntkfunction = Argmax(inputs[0], axis, ToFixedWStringFromMultiByte(node->Name()));
         return cntkfunction;
     }
     else if (onnxOpName == "ArgMin")
     {
         int64_t axisIndex = GetNamedAttributeAsInt64(node, "axis");
         Axis axis = ConvertONNXAxisToCNTKCppApi(axisIndex, inputs[0]);
-        FunctionPtr cntkFunction = Argmin(inputs[0], axis, ToFixedWString(node->Name(), false));
+        FunctionPtr cntkFunction = Argmin(inputs[0], axis, ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "Reshape")
@@ -2513,7 +2513,7 @@ FunctionPtr ONNXToCNTKHelper::CreateFunction(const Node *node, const std::vector
             // TODO: this is to undo reshape after LSTM in CNTKToONNX to workaround
             // output shape mismatch with input to the nexk LSTM layer.
             newShape = newShape.SubShape(0, newShape.Rank() - inputs[0].DynamicAxes().size());
-            return Reshape(inputs[0], newShape, ToFixedWString(node->Name(), false));
+            return Reshape(inputs[0], newShape, ToFixedWStringFromMultiByte(node->Name()));
         }
 
         if (inputs[0].DynamicAxes().size() > 0)
@@ -2545,7 +2545,7 @@ FunctionPtr ONNXToCNTKHelper::CreateFunction(const Node *node, const std::vector
             newShape[inferredDim] = inferredDimSize;
         }
 
-        FunctionPtr cntkFunction = Reshape(inputs[0], newShape, ToFixedWString(node->Name(), false));
+        FunctionPtr cntkFunction = Reshape(inputs[0], newShape, ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "Concat")
@@ -2558,12 +2558,12 @@ FunctionPtr ONNXToCNTKHelper::CreateFunction(const Node *node, const std::vector
         std::vector<Variable> fixedInputs;
         if (FixConstantShapeForConstantVariableInputPair(inputs, fixedInputs))
         {
-            FunctionPtr cntkFunction = Splice(fixedInputs, axis, ToFixedWString(node->Name(), false));
+            FunctionPtr cntkFunction = Splice(fixedInputs, axis, ToFixedWStringFromMultiByte(node->Name()));
             return cntkFunction;
         }
         else
         {
-            FunctionPtr cntkFunction = Splice(inputs, axis, ToFixedWString(node->Name(), false));
+            FunctionPtr cntkFunction = Splice(inputs, axis, ToFixedWStringFromMultiByte(node->Name()));
             return cntkFunction;
         }
     }
@@ -2601,14 +2601,14 @@ FunctionPtr ONNXToCNTKHelper::CreateFunction(const Node *node, const std::vector
             starts.erase(starts.begin());
             ends.erase(ends.begin());
         }
-        FunctionPtr cntkFunction = Slice(inputs[0], axes, starts, ends, ToFixedWString(node->Name(), false));
+        FunctionPtr cntkFunction = Slice(inputs[0], axes, starts, ends, ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "Transpose")
     {
         std::vector<int64_t> permutation = GetNamedAttributeAsInt64Vec(node, "perm");
         std::vector<Axis> argsortedPermutation = ConvertPermutationONNXToCNTK(permutation, inputs[0].HasBatchAxis(), inputs[0].HasSequenceAxis());
-        FunctionPtr cntkFunction = Transpose(inputs[0], argsortedPermutation, ToFixedWString(node->Name(), false));
+        FunctionPtr cntkFunction = Transpose(inputs[0], argsortedPermutation, ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "Pad")
@@ -2645,7 +2645,7 @@ FunctionPtr ONNXToCNTKHelper::CreateFunction(const Node *node, const std::vector
                                           padsPair.first,
                                           padsPair.second,
                                           cntkConstantValue,
-                                          ToFixedWString(node->Name(), false));
+                                          ToFixedWStringFromMultiByte(node->Name()));
 
         return cntkPadFunction;
     }
@@ -2655,28 +2655,28 @@ FunctionPtr ONNXToCNTKHelper::CreateFunction(const Node *node, const std::vector
         {
             int64_t axisIndex = GetNamedAttributeAsInt64(node, "axis", 0);
             Axis axis = ConvertONNXAxisToCNTKCppApi(axisIndex, inputs[0]);
-            return GatherOp(inputs[1], inputs[0], axis, ToFixedWString(node->Name(), false));
+            return GatherOp(inputs[1], inputs[0], axis, ToFixedWStringFromMultiByte(node->Name()));
         }
         else
         {
-            FunctionPtr cntkFunction = GatherOp(inputs[1], inputs[0], ToFixedWString(node->Name(), false));
+            FunctionPtr cntkFunction = GatherOp(inputs[1], inputs[0], ToFixedWStringFromMultiByte(node->Name()));
             return cntkFunction;
         }
     }
     else if (onnxOpName == "DepthToSpace")
     {
         auto blockSize = GetNamedAttributeAsInt64(node, "blocksize", 1);
-        return DepthToSpace(inputs[0], static_cast<size_t>(blockSize), ToFixedWString(node->Name(), false));
+        return DepthToSpace(inputs[0], static_cast<size_t>(blockSize), ToFixedWStringFromMultiByte(node->Name()));
     }
     else if (onnxOpName == "SpaceToDepth")
     {
         auto blockSize = GetNamedAttributeAsInt64(node, "blocksize", 1);
-        return SpaceToDepth(inputs[0], static_cast<size_t>(blockSize), ToFixedWString(node->Name(), false));
+        return SpaceToDepth(inputs[0], static_cast<size_t>(blockSize), ToFixedWStringFromMultiByte(node->Name()));
     }
     else if (onnxOpName == "Squeeze")
     {
         std::vector<Axis> axes = GetNamedAttributeAsAxes(node, "axes");
-        return Squeeze(inputs[0], axes, ToFixedWString(node->Name(), false));
+        return Squeeze(inputs[0], axes, ToFixedWStringFromMultiByte(node->Name()));
     }
     else if (onnxOpName == "ImageScaler")
     {
@@ -2687,11 +2687,11 @@ FunctionPtr ONNXToCNTKHelper::CreateFunction(const Node *node, const std::vector
         {
             // CNTK does not have batch axis in shape dimensions.
             Variable inputReshaped = Reshape(inputs[0], inputShape.SubShape(0, 3));
-            return ImageScaler(inputReshaped, scale, bias, ToFixedWString(node->Name(), false));
+            return ImageScaler(inputReshaped, scale, bias, ToFixedWStringFromMultiByte(node->Name()));
         }
         else
         {
-            return ImageScaler(inputs[0], scale, bias, ToFixedWString(node->Name(), false));
+            return ImageScaler(inputs[0], scale, bias, ToFixedWStringFromMultiByte(node->Name()));
         }
     }
     else if (onnxOpName == "MeanVarianceNormalization")
@@ -2701,31 +2701,31 @@ FunctionPtr ONNXToCNTKHelper::CreateFunction(const Node *node, const std::vector
         // when loading the ONNX MeanVarianceNormalization node in CNTK.
         size_t acrossChannels = GetNamedAttributeAsInt64(node, "across_channels", 0);
         size_t normalizeVariance = GetNamedAttributeAsInt64(node, "normalize_variance", 1);
-        return MeanVarianceNormalization(inputs[0], !!acrossChannels, !!normalizeVariance, ToFixedWString(node->Name(), false));
+        return MeanVarianceNormalization(inputs[0], !!acrossChannels, !!normalizeVariance, ToFixedWStringFromMultiByte(node->Name()));
     }
     else if (onnxOpName == "Identity")
     {
-        FunctionPtr cntkFunction = Alias(inputs[0], ToFixedWString(node->Name(), false));
+        FunctionPtr cntkFunction = Alias(inputs[0], ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "Sin")
     {
-        FunctionPtr cntkFunction = Sin(inputs[0], ToFixedWString(node->Name(), false));
+        FunctionPtr cntkFunction = Sin(inputs[0], ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "Asin")
     {
-        FunctionPtr cntkFunction = Asin(inputs[0], ToFixedWString(node->Name(), false));
+        FunctionPtr cntkFunction = Asin(inputs[0], ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "Cos")
     {
-        FunctionPtr cntkFunction = Cos(inputs[0], ToFixedWString(node->Name(), false));
+        FunctionPtr cntkFunction = Cos(inputs[0], ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "Acos")
     {
-        FunctionPtr cntkFunction = Acos(inputs[0], ToFixedWString(node->Name(), false));
+        FunctionPtr cntkFunction = Acos(inputs[0], ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "Cast")
@@ -2737,12 +2737,12 @@ FunctionPtr ONNXToCNTKHelper::CreateFunction(const Node *node, const std::vector
     }
     else if (onnxOpName == "Tan")
     {
-        FunctionPtr cntkFunction = Tan(inputs[0], ToWString(node->Name()));
+        FunctionPtr cntkFunction = Tan(inputs[0], ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "Atan")
     {
-        FunctionPtr cntkFunction = Atan(inputs[0], ToWString(node->Name()));
+        FunctionPtr cntkFunction = Atan(inputs[0], ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else
@@ -2844,7 +2844,7 @@ FunctionPtr ONNXToCNTKHelper::CreateCNTKNode(const Node *node, const std::vector
     {
         // TODO: this is for sink or source - what type of variable for it?
         NDShape shape;
-        Constant constantVariable(shape, 0.5F, computeDevice, ToFixedWString(node->Name(), false));
+        Constant constantVariable(shape, 0.5F, computeDevice, ToFixedWStringFromMultiByte(node->Name()));
         return constantVariable;
     }
     else if (onnxOpName == "Constant")
@@ -2905,7 +2905,7 @@ Variable ONNXToCNTKHelper::GetNodeOperandWithPaddingResolved(std::vector<bool> &
                                               padsPair.first,
                                               padsPair.second,
                                               padValue,
-                                              ToFixedWString(nodeName, false));
+                                              ToFixedWStringFromMultiByte(nodeName));
             convOperand = (Variable) cntkPadFunction;
         }
         cntkConvAutoPadding.insert(cntkConvAutoPadding.begin(), strides.Rank(), false); // For 'VALID' convolution
@@ -3017,7 +3017,7 @@ FunctionPtr ONNXToCNTKHelper::CreateCNTKConvTransposeNode(const Node *node, cons
             dilation,
             reductionRank,
             maxTempMemSizeInSamples,
-            ToFixedWString(node->Name(), false));
+            ToFixedWStringFromMultiByte(node->Name()));
     }
     else if (HasNamedAttribute(node, "pads"))
     {
@@ -3057,7 +3057,7 @@ FunctionPtr ONNXToCNTKHelper::CreateCNTKConvNode(const Node *node, const std::ve
         reductionRank,
         groups,
         maxTempMemSizeInSamples,
-        ToFixedWString(node->Name(), false));
+        ToFixedWStringFromMultiByte(node->Name()));
 
     // TODO: support bias in CNTK op.
     if (inputs.size() == 3)

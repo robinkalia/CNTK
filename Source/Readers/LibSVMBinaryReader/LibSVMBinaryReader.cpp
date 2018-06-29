@@ -257,7 +257,7 @@ void SparseBinaryInput<ElemType>::Init(std::map<std::wstring, std::wstring> rena
         m_inFile.read((char*) tempName, len);
         tempName[len] = '\0';
         // std::string name((char*)header_buffer + base_offset, len);
-        std::wstring wname = Microsoft::MSR::CNTK::ToFixedWString(tempName, false);
+        std::wstring wname = Microsoft::MSR::CNTK::ToFixedWStringFromMultiByte(tempName);
         if (rename.find(wname) == rename.end())
         {
             m_features.emplace_back(wname);
@@ -288,7 +288,7 @@ void SparseBinaryInput<ElemType>::Init(std::map<std::wstring, std::wstring> rena
         // std::string name((char*)header_buffer + base_offset, len);
         m_inFile.read((char*) tempName, len);
         tempName[len] = '\0';
-        std::wstring wname = Microsoft::MSR::CNTK::ToFixedWString(tempName, false);
+        std::wstring wname = Microsoft::MSR::CNTK::ToFixedWStringFromMultiByte(tempName);
         if (rename.find(wname) == rename.end())
         {
             m_labels.emplace_back(wname);
