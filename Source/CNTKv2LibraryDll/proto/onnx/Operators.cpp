@@ -207,7 +207,7 @@ namespace ONNX
         } } },
         { L"ELU", { {
             { L"ELU", "Elu" },
-            // { L"", "alpha" },
+            { L"alpha", "alpha" },
         } } },
         { L"Exp", { {
             { L"Exp", "Exp" },
@@ -281,11 +281,17 @@ namespace ONNX
         { L"Sin",{ {
             { L"Sin", "Sin" },
         } } },
+        { L"Tan",{ {
+            { L"Tan", "Tan" },
+            } } },
         { L"Acos",{ {
             { L"Acos", "Acos" },
         } } },
         { L"Asin",{ {
             { L"Asin", "Asin" },
+        } } },
+        { L"Atan",{ {
+            { L"Atan", "Atan" },
         } } },
 
         // From reduction
@@ -465,6 +471,7 @@ namespace ONNX
     }
         std::unordered_map<std::wstring, std::set<size_t>> Operators::_cntkBlockOPInvalidIndices = {
             { L"Clip",{ 1, 2 } },
+            { L"ELU",{ 0, 1 } },
             { L"LeakyReLU",{ 0, 1 } },
             { L"SELU",{ 0, 1, 2 } },
             { L"PReLU",{ 0 } },

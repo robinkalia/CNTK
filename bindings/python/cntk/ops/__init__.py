@@ -1363,10 +1363,10 @@ def relu(x, name=''):
 
 
 @typemap
-def elu(x, name=''):
+def elu(x, alpha=1.0, name=''):
     '''
     Exponential linear unit operation. Computes the element-wise exponential linear
-    of ``x``: ``max(x, 0)`` for ``x >= 0`` and ``x``: ``exp(x)-1`` otherwise.
+    of ``x``: ``max(x, 0)`` for ``x >= 0`` and ``x``: ``alpha * (exp(x)-1)`` otherwise.
 
     The output tensor has the same shape as ``x``.
 
@@ -1384,7 +1384,7 @@ def elu(x, name=''):
     '''
     from cntk.cntk_py import elu
     x = sanitize_input(x)
-    return elu(x, name)
+    return elu(x, alpha, name)
 
 @typemap
 def selu(x, scale=1.0507009873554804934193349852946, alpha=1.6732632423543772848170429916717, name=''):
@@ -1658,6 +1658,27 @@ def cos(x, name=''):
     return cos(x, name)
 
 @typemap
+def tan(x, name=''):
+    '''
+    Computes the element-wise tangent of ``x``:
+
+    The output tensor has the same shape as ``x``.
+
+    Example:
+        >>> np.round(C.tan([-1, 0, 1]).eval(), 5)
+        array([-1.55741,  0.     ,  1.55741], dtype=float32)
+
+    Args:
+        x: numpy array or any :class:`~cntk.ops.functions.Function` that outputs a tensor
+        name (str, optional): the name of the Function instance in the network
+    Returns:
+        :class:`~cntk.ops.functions.Function`
+    '''
+    from cntk.cntk_py import tan
+    x = sanitize_input(x)
+    return tan(x, name)
+
+@typemap
 def acos(x, name=''):
     '''
     Computes the element-wise arccos (inverse cosine) of ``x``:
@@ -1700,6 +1721,27 @@ def asin(x, name=''):
     from cntk.cntk_py import asin
     x = sanitize_input(x)
     return asin(x, name)
+
+@typemap
+def atan(x, name=''):
+    '''
+    Computes the element-wise arctan (inverse tangent) of ``x``:
+
+    The output tensor has the same shape as ``x``.
+
+    Example:
+        >>> np.round(C.atan([-1, 0, 1]).eval(), 5)
+        array([-0.78539997,  0.        ,  0.78539997], dtype=float32)
+
+    Args:
+        x: numpy array or any :class:`~cntk.ops.functions.Function` that outputs a tensor
+        name (str, optional): the name of the Function instance in the network
+    Returns:
+        :class:`~cntk.ops.functions.Function`
+    '''
+    from cntk.cntk_py import atan
+    x = sanitize_input(x)
+    return atan(x, name)
 
 @typemap
 def sinh(x, name=''):
