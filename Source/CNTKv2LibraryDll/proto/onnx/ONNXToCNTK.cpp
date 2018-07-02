@@ -2721,7 +2721,7 @@ FunctionPtr ONNXToCNTKHelper::CreateFunction(const Node *node, const std::vector
     {
         TensorProto_DataType newDataType = static_cast<TensorProto_DataType>(GetNamedAttributeAsInt64(node, "to"));
         DataType cntkNewDataType = ConvertDataTypeTensorProtoToCNTK(newDataType);
-        FunctionPtr cntkFunction = Cast(inputs[0], cntkNewDataType, ToWString(node->Name()));
+        FunctionPtr cntkFunction = Cast(inputs[0], cntkNewDataType, ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "Tan")
