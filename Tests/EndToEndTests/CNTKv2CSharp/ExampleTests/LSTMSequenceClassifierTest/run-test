@@ -4,12 +4,11 @@
 
 if [ "$OS" == "Windows_NT" ]; then
   pushd $TEST_BIN_DIR > /dev/null
-  dotnet CNTKLibraryCSTrainingTest.dll LSTMSequenceClassifierTest
-  popd > /dev/null
 else
-  echo Cannot run CNTKLibraryCSTrainingTest on Linux.
-  exit 1
+  pushd $TEST_BIN_DIR/../lib > /dev/null
 fi
+dotnet CNTKLibraryCSTrainingTest.dll LSTMSequenceClassifierTest
+popd > /dev/null
 
 ExitCode=$?
 

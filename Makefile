@@ -1619,7 +1619,7 @@ CNTKLibraryCSTrainingTest.dll: csharp
 	cd Tests/EndToEndTests/CNTKv2CSharp/CNTKLibraryCSTrainingTest && \
 		mkdir -p build/Linux/$(CSHARP_BUILDTYPE) && \
 		dotnet build /p:OutDirPrefix=build/Linux/$(CSHARP_BUILDTYPE) /p:PlatformName=Linux -c $(CSHARP_BUILDTYPE) CNTKLibraryCSTrainingTest.csproj
-	cp Tests/EndToEndTests/CNTKv2CSharp/CNTKLibraryCSTrainingTest/build/Linux/$(CSHARP_BUILDTYPE)/AnyCPU/$(CSHARP_BUILDTYPE)/CNTKLibraryCSTrainingTest.* $(LIBDIR)
+	cp Tests/EndToEndTests/CNTKv2CSharp/CNTKLibraryCSTrainingTest/build/Linux/$(CSHARP_BUILDTYPE)/AnyCPU/$(CSHARP_BUILDTYPE)/*.* $(LIBDIR)
 	
 ALL += CNTKLibraryCSTrainingTest.dll
 

@@ -2,7 +2,6 @@
 
 . $TEST_ROOT_DIR/run-test-common
 
-if [ "$OS" == "Windows_NT" ]; then
     # This test uses a large dataset which is not part of the CNTK repository itself
     # We use the dataset from an external location specified using an environment variable
     if [[ "$CNTK_EXTERNAL_TESTDATA_SOURCE_DIRECTORY" == "" || ! -d "$CNTK_EXTERNAL_TESTDATA_SOURCE_DIRECTORY" ]]; then
@@ -14,28 +13,36 @@ if [ "$OS" == "Windows_NT" ]; then
     mkdir -p $TestDataDir
 
     # Copy and extract animal data to the test run directory
-    DataSourceDir=`cygpath -au $CNTK_EXTERNAL_TESTDATA_SOURCE_DIRECTORY`/Image
+    if [ "$OS" == "Windows_NT" ]; then
+      DataSourceDir=`cygpath -au $CNTK_EXTERNAL_TESTDATA_SOURCE_DIRECTORY`/Image
+    else
+      DataSourceDir=$CNTK_EXTERNAL_TESTDATA_SOURCE_DIRECTORY/Image
+    fi
     echo cp -R $DataSourceDir/Animals $TestDataDir
     cp -R $DataSourceDir/Animals $TestDataDir || exit $?
     python extract_animal_data.py $TestDataDir/Animals/Animals.zip $TestDataDir
 
     # Copy resnet model to the test run directory
-    ModelSource=`cygpath -au $CNTK_EXTERNAL_TESTDATA_SOURCE_DIRECTORY`/PreTrainedModels/ResNet/v1/ResNet_18.model
+    if [ "$OS" == "Windows_NT" ]; then
+      ModelSource=`cygpath -au $CNTK_EXTERNAL_TESTDATA_SOURCE_DIRECTORY`/PreTrainedModels/ResNet/v1/ResNet_18.model
+    else
+      ModelSource=$CNTK_EXTERNAL_TESTDATA_SOURCE_DIRECTORY/PreTrainedModels/ResNet/v1/ResNet_18.model
+    fi
     cp $ModelSource $TestDataDir || exit $?
 
 	pushd $TestDataDir
-	
+  if [ "$OS" == "Windows_NT" ]; then      
     pushd $TEST_BIN_DIR > /dev/null
-    dotnet CNTKLibraryCSTrainingTest.dll TransferLearningTest `cygpath -aw $TestDataDir`
-	popd > /dev/null
+    TestDataDirForPlatform=`cygpath -aw $TestDataDir`
+  else
+    pushd $TEST_BIN_DIR/../lib > /dev/null
+    TestDataDirForPlatform=$TestDataDir
+  fi  
+  dotnet CNTKLibraryCSTrainingTest.dll TransferLearningTest $TestDataDirForPlatform
+  popd > /dev/null
 	
 	# Delete the test data
 	popd
 	rm -rf $TestDataDir
 	
 	exit 0
-	
-else
-  echo Cannot run CNTKLibraryCSTrainingTest on Linux.
-  exit 1
-fi
