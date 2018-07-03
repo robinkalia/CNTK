@@ -196,6 +196,11 @@ private:
     static std::vector<int64_t> ConvertPermutationCNTKToONNX(const std::vector<Axis> &axes, bool hasBatchAxis);
 
     //
+    // Convert DataType from CNTK TensorProto
+    //
+    static TensorProto_DataType ConvertDataTypeCNTKToTensorProto(CNTK::DataType newDataType);
+
+    //
     // Convert data types from CNTK to ONNX.
     //
     static void UpdateONNXType(DataType dataType, onnx::TypeProto& type);
@@ -1190,22 +1195,27 @@ void MapAndUpdateONNXType(const std::string &op, bool inputArg, int argOrder, CN
         type.mutable_tensor_type()->set_elem_type(onnx::TensorProto_DataType_FLOAT);
 }
 
-void CNTKToONNXHelper::UpdateONNXType(CNTK::DataType dataType, onnx::TypeProto &type)
+TensorProto_DataType CNTKToONNXHelper::ConvertDataTypeCNTKToTensorProto(
+    CNTK::DataType newDataType)
 {
-    switch (dataType)
+    // to TensorProto_DataType
+    switch (newDataType)
     {
     case CNTK::DataType::Float:
-        type.mutable_tensor_type()->set_elem_type(onnx::TensorProto_DataType_FLOAT);
-        break;
-    case CNTK::DataType::Float16:
-        type.mutable_tensor_type()->set_elem_type(onnx::TensorProto_DataType_FLOAT16);
-        break;
+        return TensorProto_DataType::TensorProto_DataType_FLOAT;
     case CNTK::DataType::Double:
-        type.mutable_tensor_type()->set_elem_type(onnx::TensorProto_DataType_DOUBLE);
-        break;
+        return TensorProto_DataType::TensorProto_DataType_DOUBLE;
+    case CNTK::DataType::Float16:
+        return TensorProto_DataType::TensorProto_DataType_FLOAT16;
     default:
         NOT_IMPLEMENTED;
     }
+}
+
+void CNTKToONNXHelper::UpdateONNXType(CNTK::DataType dataType, onnx::TypeProto &type)
+{
+    TensorProto_DataType tensorProtoDataType = ConvertDataTypeCNTKToTensorProto(dataType);
+    type.mutable_tensor_type()->set_elem_type(tensorProtoDataType);
 }
 
 std::string CNTKToONNXHelper::ToOPName(const FunctionPtr& src)
@@ -2847,6 +2857,12 @@ void CNTKToONNXHelper::CopyAttributes(const FunctionPtr& src, LotusIR::Node* nod
             node->AddAttribute("min", minValue);
             node->AddAttribute("max", maxValue);
         }
+        else if (src->OpName() == L"Cast")
+        {
+            DataType newDataType = static_cast<DataType>(src->Attributes()[L"newDataType"].Value<int>());
+            int64_t to = static_cast<int64_t>(ConvertDataTypeCNTKToTensorProto(newDataType));
+            node->AddAttribute(attributesMap[L"newDataType"], to);
+        }
         if (src->OpName() == L"BatchNormalization")
         {
             auto spatial = (int64_t)((bool)src->Attributes()[L"spatial"].Value<bool>() ? 1 : 0);
@@ -2875,7 +2891,7 @@ void CNTKToONNXHelper::CopyAttributes(const FunctionPtr& src, LotusIR::Node* nod
             auto alpha = (float)src->Attributes()[L"alpha"].Value<double>();
             auto beta = (float)src->Attributes()[L"beta"].Value<double>();
 
-            node->AddAttribute(attributesMap[L"size"], depthRadius);
+            node->AddAttribute(attributesMap[L"size"], 2*depthRadius + 1);
             node->AddAttribute(attributesMap[L"bias"], bias);
             node->AddAttribute(attributesMap[L"alpha"], alpha);
             node->AddAttribute(attributesMap[L"beta"], beta);

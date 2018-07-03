@@ -234,6 +234,18 @@ def test_BatchNormalization(tmpdir, dtype):
 
         verify_one_input(op_node, t, tmpdir, 'BatchNormalization')
 
+#Cast
+Cast_Type_Config = (np.float64, np.float32, np.float16)
+@pytest.mark.parametrize("from_type", Cast_Type_Config)
+@pytest.mark.parametrize("to_type", Cast_Type_Config)
+def test_Cast(tmpdir, from_type, to_type):
+    test_name = "cast_" + from_type.__name__ + "_to_" + to_type.__name__
+    shape = (3, 10, 15)
+    input_var = C.input_variable(shape, dtype = from_type, name='features') 
+    model = C.cast(input_var, dtype=to_type)
+    data = np.random.rand(*shape).astype(from_type)
+    verify_one_input(model, data, tmpdir, test_name)
+
 # Ceil
 @pytest.mark.parametrize("dtype", DType_Config)
 def test_Ceil(tmpdir, dtype):
@@ -613,7 +625,7 @@ def test_LogSoftmax(tmpdir, dtype):
 @pytest.mark.parametrize("dtype", DType_Config)
 def test_LRN(tmpdir, dtype, device_id):
     if device_id == -1 and dtype == np.float16:
-        pytest.skip('Test is skipped on CPU with float16 data')
+        pytest.skip('Test is skipped on CPU with float16 data, because it uses convolution.')
     device = cntk_device(device_id)
     with C.default_options(dtype=dtype):
         img_shape = (64, 32, 32)

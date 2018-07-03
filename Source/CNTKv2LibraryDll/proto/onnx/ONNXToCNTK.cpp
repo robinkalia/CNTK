@@ -1911,17 +1911,27 @@ std::pair<std::vector<size_t>, std::vector<size_t>> ONNXToCNTKHelper::AdjustONNX
     return SplitAndReverseVec(pads);
 }
 
+CNTK::DataType ConvertDataTypeTensorProtoToCNTK(TensorProto_DataType newDataType)
+{
+    // to TensorProto_DataType
+    switch (newDataType)
+    {
+    case TensorProto_DataType::TensorProto_DataType_FLOAT:
+        return CNTK::DataType::Float;
+    case TensorProto_DataType::TensorProto_DataType_DOUBLE:
+        return CNTK::DataType::Double;
+    case TensorProto_DataType::TensorProto_DataType_FLOAT16:
+        return CNTK::DataType::Float16;
+    default:
+        NOT_IMPLEMENTED;
+    }
+}
+
 FunctionPtr ONNXToCNTKHelper::CreateFunction(const Node *node, const std::vector<Variable> &inputs, const Graph *graph)
 {
     string onnxOpName = node->OpType();
 
-    if (onnxOpName == "Cast" && inputs[0].GetDataType() == CNTK::DataType::Float && inputs[0].Owner() != nullptr)
-    {
-        // CNTK does not support cast op. Only float is available with ONNX support.
-        // Question for having a cast op: Why not cast data as necessary internally.
-        return inputs[0].Owner();
-    }
-    else if (onnxOpName == "LSTM")
+    if (onnxOpName == "LSTM")
     {
         const string direction = GetNamedAttributeAsString(node, "direction");
         std::vector<float> activation_alpha = GetNamedAttributeAsFloatVec(node, "activation_alpha", std::vector<float>());
@@ -2009,14 +2019,12 @@ FunctionPtr ONNXToCNTKHelper::CreateFunction(const Node *node, const std::vector
     }
     else if (onnxOpName == "LRN")
     {
-        // TODO: this is experimental code to load Facebook Caffe models.
-        // Operators are added so hopefully there is not further work needed.
-        size_t depthRadius = GetNamedAttributeAsInt64(node, "size");
-        double bias = GetNamedAttributeAsFloat(node, "bias");
-        double alpha = GetNamedAttributeAsFloat(node, "alpha");
-        double beta = GetNamedAttributeAsFloat(node, "beta");
-        FunctionPtr cntkFunction = LocalResponseNormalization(inputs[0],
-                                                              depthRadius, bias, alpha, beta, ToWString(node->Name()));
+        size_t depthRadius = (GetNamedAttributeAsInt64(node, "size") - 1)/2;
+        double bias = static_cast<double>(GetNamedAttributeAsFloat(node, "bias", 1.0f));
+        double alpha = static_cast<double>(GetNamedAttributeAsFloat(node, "alpha", 1e-4f));
+        double beta = static_cast<double>(GetNamedAttributeAsFloat(node, "beta", 0.75f));
+        FunctionPtr cntkFunction = LocalResponseNormalization(inputs[0], 
+            depthRadius, bias, alpha, beta, ToWString(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "AveragePool" || onnxOpName == "MaxPool")
@@ -2384,8 +2392,7 @@ FunctionPtr ONNXToCNTKHelper::CreateFunction(const Node *node, const std::vector
         }
         else
         {
-            int index = static_cast<int>(GetNamedAttributeAsInt64(node, "axis", 0));
-            Axis axis(index - 1);
+            Axis axis(ConvertONNXAxisToCNTKCppApi(static_cast<int>(GetNamedAttributeAsInt64(node, "axis", 0)), inputs[0]));
             FunctionPtr cntkFunction = Softmax(inputs[0], axis, ToWString(node->Name()));
             return cntkFunction;
         }
@@ -2394,15 +2401,7 @@ FunctionPtr ONNXToCNTKHelper::CreateFunction(const Node *node, const std::vector
     {
         int index = static_cast<int>(GetNamedAttributeAsInt64(node, "axis", 0));
 
-        Axis axis;
-        if (index == 0)
-        {
-            axis = Axis::DefaultBatchAxis();
-        }
-        else
-        {
-            axis = Axis(index - 1);
-        }
+        Axis axis(ConvertONNXAxisToCNTKCppApi(static_cast<int>(GetNamedAttributeAsInt64(node, "axis", 0)), inputs[0]));
 
         FunctionPtr cntkFunction = LogSoftmax(inputs[0], axis, ToWString(node->Name()));
         return cntkFunction;
@@ -2719,6 +2718,13 @@ FunctionPtr ONNXToCNTKHelper::CreateFunction(const Node *node, const std::vector
     else if (onnxOpName == "Acos")
     {
         FunctionPtr cntkFunction = Acos(inputs[0], ToWString(node->Name()));
+        return cntkFunction;
+    }
+    else if (onnxOpName == "Cast")
+    {
+        TensorProto_DataType newDataType = static_cast<TensorProto_DataType>(GetNamedAttributeAsInt64(node, "to"));
+        DataType cntkNewDataType = ConvertDataTypeTensorProtoToCNTK(newDataType);
+        FunctionPtr cntkFunction = Cast(inputs[0], cntkNewDataType, ToWString(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "Tan")
