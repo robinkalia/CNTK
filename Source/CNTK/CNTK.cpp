@@ -99,14 +99,6 @@ void RedirectStdErr(wstring logpath, bool appendLogFile = false)
     static auto fKept = f;                // keep it around (until it gets changed)
 }
 
-std::string WCharToString(const wchar_t* wst)
-{
-    std::wstring ws(wst);
-    std::string s(ws.begin(), ws.end());
-    s.assign(ws.begin(), ws.end());
-    return s;
-}
-
 size_t GetMaxEpochs(const ConfigParameters& configParams)
 {
     ConfigParameters configSGD(configParams("SGD"));
