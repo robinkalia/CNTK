@@ -26,12 +26,13 @@ cp -R $DataSourceDir/cifar-10-batches-py/. $TestDataDir || exit $?
 
 pushd $TestDataDir
 
-pushd $TEST_BIN_DIR > /dev/null
-
 if [ "$OS" == "Windows_NT" ]; then
-    TestDataDirConvert = `cygpath -aw $TestDataDir`
+    pushd $TEST_BIN_DIR > /dev/null
+    TestDataDirConvert=`cygpath -aw $TestDataDir`
 else
-    TestDataDirConvert = $TestDataDir
+# we build all dlls to lib dir on Linux for now
+    pushd $TEST_BIN_DIR/../lib > /dev/null
+    TestDataDirConvert=$TestDataDir
 fi
 dotnet CNTKLibraryCSTrainingTest.dll CifarResNetClassifierTest $TestDataDirConvert
 popd > /dev/null
