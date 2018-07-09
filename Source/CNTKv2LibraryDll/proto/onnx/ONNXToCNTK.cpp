@@ -2023,7 +2023,7 @@ FunctionPtr ONNXToCNTKHelper::CreateFunction(const Node *node, const std::vector
         double alpha = GetNamedAttributeAsFloat(node, "alpha");
         double beta = GetNamedAttributeAsFloat(node, "beta");
         FunctionPtr cntkFunction = LocalResponseNormalization(inputs[0], 
-                                                              depthRadius, bias, alpha, beta, ToFixedWStringFromMultiByte(node->Name()));
+            depthRadius, bias, alpha, beta, ToFixedWStringFromMultiByte(node->Name()));
         return cntkFunction;
     }
     else if (onnxOpName == "AveragePool" || onnxOpName == "MaxPool")
@@ -2391,8 +2391,7 @@ FunctionPtr ONNXToCNTKHelper::CreateFunction(const Node *node, const std::vector
         }
         else
         {
-            int index = static_cast<int>(GetNamedAttributeAsInt64(node, "axis", 0));
-            Axis axis(index - 1);
+            Axis axis(ConvertONNXAxisToCNTKCppApi(static_cast<int>(GetNamedAttributeAsInt64(node, "axis", 0)), inputs[0]));
             FunctionPtr cntkFunction = Softmax(inputs[0], axis, ToFixedWStringFromMultiByte(node->Name()));
             return cntkFunction;
         }

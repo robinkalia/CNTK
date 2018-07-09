@@ -613,7 +613,7 @@ void SequenceReader<ElemType>::ReadClassInfo(const wstring& vocfile, int& classS
                                              noiseSampler<long>& m_noiseSampler,
                                              bool /*flatten*/)
 {
-    string tmp_vocfile(vocfile.begin(), vocfile.end()); // convert from wstring to string
+    string tmp_vocfile(Microsoft::MSR::CNTK::ToLegacyString(Microsoft::MSR::CNTK::ToUTF8(vocfile)));
     string strtmp;
     size_t cnt;
     int clsidx, b;
