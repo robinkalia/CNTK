@@ -38,7 +38,7 @@ namespace CNTK.V2LibraryCSTests
             Assert.IsTrue(Utils.IsSparseStorageFormat(StorageFormat.SparseCSC));
             Assert.IsTrue(Utils.IsSparseStorageFormat(StorageFormat.SparseBlockCol));
             Assert.AreEqual("Constant", Utils.VariableKindName(VariableKind.Constant));
-            Assert.AreEqual("PlaceHolder", Utils.VariableKindName(VariableKind.Placeholder));
+            Assert.AreEqual("Placeholder", Utils.VariableKindName(VariableKind.Placeholder));
             Assert.AreEqual("Input", Utils.VariableKindName(VariableKind.Input));
             Assert.AreEqual("Output", Utils.VariableKindName(VariableKind.Output));
             Assert.AreEqual("Parameter", Utils.VariableKindName(VariableKind.Parameter));
