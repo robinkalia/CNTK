@@ -16,6 +16,7 @@
 using namespace LotusIR;
 using namespace CNTK;
 using namespace CNTK::ONNX;
+using namespace onnx;
 using namespace Microsoft::MSR::CNTK;
 
 namespace CNTK
@@ -3056,6 +3057,7 @@ FunctionPtr ONNXToCNTKHelper::CreateCNTKConvNode(const Node *node, const std::ve
         reductionRank,
         groups,
         maxTempMemSizeInSamples,
+        false, // TODO : Setting to default not convolving over sequential axis for now. 
         ToFixedWStringFromMultiByte(node->Name()));
 
     // TODO: support bias in CNTK op.
