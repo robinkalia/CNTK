@@ -1638,6 +1638,17 @@ CNTKLibraryCSTrainingTest.dll: csharp
 	
 ALL += CNTKLibraryCSTrainingTest.dll
 
+# Note that CMakeLists.txt has not been created for this project yet. The paths created here are really ugly.
+CNTKLibraryCSEvalExamplesTest.dll: csharp
+	@echo $(SEPARATOR)
+	@echo creating $@ for $(ARCH) with build type $(CSHARP_BUILDTYPE)
+	cd Tests/EndToEndTests/EvalClientTests/CNTKLibraryCSEvalExamplesTest && \
+		mkdir -p build/Linux/$(CSHARP_BUILDTYPE) && \
+		dotnet build /p:OutDirPrefix=build/Linux/$(CSHARP_BUILDTYPE) /p:PlatformName=Linux -c $(CSHARP_BUILDTYPE) CNTKLibraryCSEvalExamplesTest.csproj
+	cp Tests/EndToEndTests/CNTKv2CSharp/CNTKLibraryCSEvalExamplesTest/build/Linux/$(CSHARP_BUILDTYPE)/AnyCPU/$(CSHARP_BUILDTYPE)/*.* $(LIBDIR)
+
+ALL += CNTKLibraryCSEvalExamplesTest.dll
+
 endif
 
 ########################################
