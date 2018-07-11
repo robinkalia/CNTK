@@ -4,11 +4,13 @@
 
 cp $TEST_DIR/../../../../../Tests/EndToEndTests/Simple2d/Data/SimpleDataTrain_cntk_text.txt $TEST_DIR || exit $?
 if [ "$OS" == "Windows_NT" ]; then  
+  TestDataDir=`cygpath -aw $TEST_BIN_DIR`/../../
   pushd $TEST_BIN_DIR > /dev/null
 else
+  TestDataDir=$TEST_BIN_DIR/../../../
   pushd $TEST_BIN_DIR/../lib > /dev/null
 fi 
-dotnet CNTKLibraryCSTrainingTest.dll SimpleFeedForwardClassifierTest
+dotnet CNTKLibraryCSTrainingTest.dll SimpleFeedForwardClassifierTest $TestDataDir
 popd > /dev/null
 
 ExitCode=$?
