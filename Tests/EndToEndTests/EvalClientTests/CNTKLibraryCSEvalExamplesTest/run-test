@@ -61,7 +61,6 @@ else
   echo 'Running command "dotnet CNTKLibraryCSEvalExamplesTest.dll" $RunTestDataDir'
   dotnet CNTKLibraryCSEvalExamplesTest.dll $RunTestDataDir
   popd > /dev/null
-  exit 1
 fi
 
 # This is created by train_models_for_evaluation.py, remove after test
