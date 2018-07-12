@@ -1,10 +1,8 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
   <Import Project="..\..\..\CNTK.Common.props" />
- 
   <PropertyGroup>
     <OutDirPrefix Condition="'$(OutDirPrefix)' == ''">..\..\..</OutDirPrefix>
-	
-	<!-- 
+    <!-- 
 	This is tricky. The Swig code generated has 4 variations: Windows Debug, Windows Release, Linux Debug, and Linux Release.
 	These variations are necessary, as the swig-generated code pinvokes into Cntk.Core.CSBinding-<version>[d].[dll|so] as part of
 	an attribute, which can't be configured at runtime. So, what we are doing here is generating a cross-platform binary tightly 
@@ -25,9 +23,11 @@
 	Was:
 		<PlatformName Condition="'$(PlatformName)' == ''">__This_Value_Must_Be_Set_To_Windows_Or_Linux__</PlatformName>
 	-->
-	<PlatformName Condition="'$(PlatformName)' == ''">Windows</PlatformName>
+    <PlatformName Condition="'$(PlatformName)' == ''">Windows</PlatformName>
+    <FileUpgradeFlags>40</FileUpgradeFlags>
+    <UpgradeBackupLocation>D:\users\guoye\tools\cntk\CNTK\Backup\bindings\csharp\CNTKLibraryManagedDll\</UpgradeBackupLocation>
+    <OldToolsVersion>2.0</OldToolsVersion>
   </PropertyGroup>
-  
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <Configurations>Debug;Release;Release_CpuOnly;Debug_CpuOnly;Release_NoOpt</Configurations>
@@ -47,12 +47,10 @@
     <Product>Cntk.Core.Managed</Product>
     <Version>$(CntkVersion)</Version>
     <PlatformTarget>x64</PlatformTarget>
-	<DebugType>portable</DebugType>
-     
+    <DebugType>portable</DebugType>
     <PackageId>Cntk.Core.Managed</PackageId>
     <PackageId Condition="'$(CntkComponentSuffix)'!=''">Cntk.Core.Managed-$(CntkComponentSuffix)</PackageId>
   </PropertyGroup>
-  
   <ItemGroup>
     <Compile Include="Helper.cs" />
     <Compile Include="ShimApiClasses\AxisShim.cs" />
@@ -133,7 +131,7 @@
     <Compile Include="..\Swig\Generated\$(PlatformName)\$(FlavorName)\StreamInformation.cs" Link="Generated\StreamInformation.cs" />
     <Compile Include="..\Swig\Generated\$(PlatformName)\$(FlavorName)\StringVector.cs" Link="Generated\StringVector.cs" />
     <Compile Include="..\Swig\Generated\$(PlatformName)\$(FlavorName)\SWIGTYPE_p_int8_t.cs" Link="Generated\SWIGTYPE_p_int8_t.cs" />
-	<Compile Include="..\Swig\Generated\$(PlatformName)\$(FlavorName)\SWIGTYPE_p_int16_t.cs" Link="Generated\SWIGTYPE_p_int16_t.cs" />
+    <Compile Include="..\Swig\Generated\$(PlatformName)\$(FlavorName)\SWIGTYPE_p_int16_t.cs" Link="Generated\SWIGTYPE_p_int16_t.cs" />
     <Compile Include="..\Swig\Generated\$(PlatformName)\$(FlavorName)\SWIGTYPE_p_void.cs" Link="Generated\SWIGTYPE_p_void.cs" />
     <Compile Include="..\Swig\Generated\$(PlatformName)\$(FlavorName)\TraceLevel.cs" Link="Generated\TraceLevel.cs" />
     <Compile Include="..\Swig\Generated\$(PlatformName)\$(FlavorName)\Trainer.cs" Link="Generated\Trainer.cs" />
@@ -155,21 +153,17 @@
     <Compile Include="..\Swig\Generated\$(PlatformName)\$(FlavorName)\VectorPairSizeTDouble.cs" Link="Generated\VectorPairSizeTDouble.cs" />
     <Compile Include="Utils.cs" />
   </ItemGroup>
-
   <ItemGroup>
     <Folder Include="ShimApiClasses\" />
   </ItemGroup>
-
   <ItemGroup Condition="$(CpuOnlyBuild)">
     <Compile Include="CNTKLibraryManagedDll-CPUOnly-AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup Condition="$(GpuBuild)">
     <Compile Include="CNTKLibraryManagedDll-GPU-AssemblyInfo.cs" />
   </ItemGroup>
-  
   <Target Name="Build" Condition="$(HasSwig)" DependsOnTargets="$(BuildDependsOn)" />
   <Target Name="CheckDependencies">
     <Warning Condition="!$(HasSwig)" Text="The project requires SWIG to be installed. Please see https://docs.microsoft.com/en-us/cognitive-toolkit/Setup-CNTK-on-Windows#optional-swig for installation instructions." />
   </Target>
-  
 </Project>
