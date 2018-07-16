@@ -1622,8 +1622,8 @@ V2LibraryCSTests.dll: csharp
 	cd Tests/UnitTests/V2LibraryCSTests && \
 		mkdir -p build/Linux/$(CSHARP_BUILDTYPE) && \
 		dotnet build /p:OutDirPrefix=build/Linux/$(CSHARP_BUILDTYPE) /p:PlatformName=Linux -c $(CSHARP_BUILDTYPE)
-	cp Tests/UnitTests/V2LibraryCSTests/build/Linux/$(CSHARP_BUILDTYPE)/AnyCPU/$(CSHARP_BUILDTYPE)/V2LibraryCSTests.* $(LIBDIR)
-	cp Tests/UnitTests/V2LibraryCSTests/build/Linux/$(CSHARP_BUILDTYPE)/AnyCPU/$(CSHARP_BUILDTYPE)/Microsoft.VisualStudio.* $(LIBDIR)
+	cp -f Tests/UnitTests/V2LibraryCSTests/build/Linux/$(CSHARP_BUILDTYPE)/AnyCPU/$(CSHARP_BUILDTYPE)/V2LibraryCSTests.* $(LIBDIR)
+	cp -f Tests/UnitTests/V2LibraryCSTests/build/Linux/$(CSHARP_BUILDTYPE)/AnyCPU/$(CSHARP_BUILDTYPE)/Microsoft.VisualStudio.* $(LIBDIR)
 	
 ALL += V2LibraryCSTests.dll
 
@@ -1634,7 +1634,7 @@ CNTKLibraryCSTrainingTest.dll: csharp
 	cd Tests/EndToEndTests/CNTKv2CSharp/CNTKLibraryCSTrainingTest && \
 		mkdir -p build/Linux/$(CSHARP_BUILDTYPE) && \
 		dotnet build /p:OutDirPrefix=build/Linux/$(CSHARP_BUILDTYPE) /p:PlatformName=Linux -c $(CSHARP_BUILDTYPE) CNTKLibraryCSTrainingTest.csproj
-	cp Tests/EndToEndTests/CNTKv2CSharp/CNTKLibraryCSTrainingTest/build/Linux/$(CSHARP_BUILDTYPE)/AnyCPU/$(CSHARP_BUILDTYPE)/*.* $(LIBDIR)
+	cp -f Tests/EndToEndTests/CNTKv2CSharp/CNTKLibraryCSTrainingTest/build/Linux/$(CSHARP_BUILDTYPE)/AnyCPU/$(CSHARP_BUILDTYPE)/*.* $(LIBDIR)
 	
 ALL += CNTKLibraryCSTrainingTest.dll
 
@@ -1645,7 +1645,7 @@ CNTKLibraryCSEvalExamplesTest.dll: csharp
 	cd Tests/EndToEndTests/EvalClientTests/CNTKLibraryCSEvalExamplesTest && \
 		mkdir -p build/Linux/$(CSHARP_BUILDTYPE) && \
 		dotnet build /p:OutDirPrefix=build/Linux/$(CSHARP_BUILDTYPE) /p:PlatformName=Linux -c $(CSHARP_BUILDTYPE) CNTKLibraryCSEvalExamplesTest.csproj
-	cp Tests/EndToEndTests/EvalClientTests/CNTKLibraryCSEvalExamplesTest/build/Linux/$(CSHARP_BUILDTYPE)/AnyCPU/$(CSHARP_BUILDTYPE)/*.* $(LIBDIR)
+	cp -f Tests/EndToEndTests/EvalClientTests/CNTKLibraryCSEvalExamplesTest/build/Linux/$(CSHARP_BUILDTYPE)/AnyCPU/$(CSHARP_BUILDTYPE)/*.* $(LIBDIR)
 
 ALL += CNTKLibraryCSEvalExamplesTest.dll
 
