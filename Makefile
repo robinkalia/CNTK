@@ -1607,7 +1607,9 @@ csharp: $(CSHARP_LIBS)
 	cd bindings/csharp/Swig/build/Linux/$(CSHARP_BUILDTYPE) && \
 		cmake ../../.. -DCNTK_VERSION=$(BUILD_VERSION) -DCMAKE_BUILD_TYPE=$(CSHARP_BUILDTYPE) -DCNTK_BUILD_LIB_DIR_HACK=$(LIBDIR) && \
 		make clean && \
-		make all
+		make all && \
+		grep UTF ../../../Generated/cntk_cs_wrap.cxx
+
 	mkdir -p bindings/csharp/CNTKLibraryManagedDll/build/Linux/$(CSHARP_BUILDTYPE)
 	cd bindings/csharp/CNTKLibraryManagedDll/build/Linux/$(CSHARP_BUILDTYPE) && \
 		cmake ../../.. -DCNTK_VERSION=$(BUILD_VERSION) -DCMAKE_BUILD_TYPE=$(CSHARP_BUILDTYPE) -DCNTK_BUILD_LIB_DIR_HACK=$(LIBDIR) && \
@@ -1622,7 +1624,7 @@ V2LibraryCSTests.dll: csharp
 	@echo creating $@ for $(ARCH) with build type $(CSHARP_BUILDTYPE)
 	cd Tests/UnitTests/V2LibraryCSTests && \
 		mkdir -p build/Linux/$(CSHARP_BUILDTYPE) && \
-		dotnet build /p:OutDirPrefix=build/Linux/$(CSHARP_BUILDTYPE) /p:PlatformName=Linux -c $(CSHARP_BUILDTYPE)
+		dotnet build --force /p:OutDirPrefix=build/Linux/$(CSHARP_BUILDTYPE) /p:PlatformName=Linux -c $(CSHARP_BUILDTYPE)
 	cp -f Tests/UnitTests/V2LibraryCSTests/build/Linux/$(CSHARP_BUILDTYPE)/AnyCPU/$(CSHARP_BUILDTYPE)/V2LibraryCSTests.* $(LIBDIR)
 	cp -f Tests/UnitTests/V2LibraryCSTests/build/Linux/$(CSHARP_BUILDTYPE)/AnyCPU/$(CSHARP_BUILDTYPE)/Microsoft.VisualStudio.* $(LIBDIR)
 	
@@ -1634,7 +1636,7 @@ CNTKLibraryCSTrainingTest.dll: csharp
 	@echo creating $@ for $(ARCH) with build type $(CSHARP_BUILDTYPE)
 	cd Tests/EndToEndTests/CNTKv2CSharp/CNTKLibraryCSTrainingTest && \
 		mkdir -p build/Linux/$(CSHARP_BUILDTYPE) && \
-		dotnet build /p:OutDirPrefix=build/Linux/$(CSHARP_BUILDTYPE) /p:PlatformName=Linux -c $(CSHARP_BUILDTYPE) CNTKLibraryCSTrainingTest.csproj
+		dotnet build --force /p:OutDirPrefix=build/Linux/$(CSHARP_BUILDTYPE) /p:PlatformName=Linux -c $(CSHARP_BUILDTYPE) CNTKLibraryCSTrainingTest.csproj
 	cp -f Tests/EndToEndTests/CNTKv2CSharp/CNTKLibraryCSTrainingTest/build/Linux/$(CSHARP_BUILDTYPE)/AnyCPU/$(CSHARP_BUILDTYPE)/*.* $(LIBDIR)
 	
 ALL += CNTKLibraryCSTrainingTest.dll
@@ -1645,7 +1647,7 @@ CNTKLibraryCSEvalExamplesTest.dll: csharp
 	@echo creating $@ for $(ARCH) with build type $(CSHARP_BUILDTYPE)
 	cd Tests/EndToEndTests/EvalClientTests/CNTKLibraryCSEvalExamplesTest && \
 		mkdir -p build/Linux/$(CSHARP_BUILDTYPE) && \
-		dotnet build /p:OutDirPrefix=build/Linux/$(CSHARP_BUILDTYPE) /p:PlatformName=Linux -c $(CSHARP_BUILDTYPE) CNTKLibraryCSEvalExamplesTest.csproj
+		dotnet build --force /p:OutDirPrefix=build/Linux/$(CSHARP_BUILDTYPE) /p:PlatformName=Linux -c $(CSHARP_BUILDTYPE) CNTKLibraryCSEvalExamplesTest.csproj
 	cp -f Tests/EndToEndTests/EvalClientTests/CNTKLibraryCSEvalExamplesTest/build/Linux/$(CSHARP_BUILDTYPE)/AnyCPU/$(CSHARP_BUILDTYPE)/*.* $(LIBDIR)
 
 ALL += CNTKLibraryCSEvalExamplesTest.dll
