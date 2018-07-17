@@ -10,6 +10,6 @@ if [ "$OS" == "Windows_NT" ]; then
     "$VSTEST_CONSOLE" /inIsolation /Platform:x64 $(cygpath -aw "$TEST_BIN_DIR/V2LibraryCSTests.dll") || exit $?
 else
 
-    dotnet vstest /InIsolation /Platform:x64 /Framework:".NetCoreApp,Version=v2.0" $TEST_BIN_DIR/../lib/V2LibraryCSTests.dll || exit $?
+    dotnet vstest /InIsolation /Platform:x64 /logger:"console;verbosity=detailed" $TEST_BIN_DIR/../lib/V2LibraryCSTests.dll || exit $?
 
 fi
