@@ -3,10 +3,10 @@
 . $TEST_ROOT_DIR/run-test-common
 
 if [ "$OS" == "Windows_NT" ]; then
-  TestDataDir=`cygpath -aw $TEST_BIN_DIR`/../../
+  TestDataDir=`cygpath -aw $TEST_ROOT_DIR`/../../
   pushd $TEST_BIN_DIR > /dev/null
 else
-  TestDataDir=$TEST_BIN_DIR/../../../
+  TestDataDir=$TEST_ROOT_DIR/../../
   pushd $TEST_BIN_DIR/../lib > /dev/null
 fi
 dotnet CNTKLibraryCSTrainingTest.dll LSTMSequenceClassifierTest $TestDataDir
