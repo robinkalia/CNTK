@@ -1607,8 +1607,7 @@ csharp: $(CSHARP_LIBS)
 	cd bindings/csharp/Swig/build/Linux/$(CSHARP_BUILDTYPE) && \
 		cmake ../../.. -DCNTK_VERSION=$(BUILD_VERSION) -DCMAKE_BUILD_TYPE=$(CSHARP_BUILDTYPE) -DCNTK_BUILD_LIB_DIR_HACK=$(LIBDIR) && \
 		make clean && \
-		make all && \
-		grep UTF ../../../Generated/cntk_cs_wrap.cxx
+		make all
 
 	mkdir -p bindings/csharp/CNTKLibraryManagedDll/build/Linux/$(CSHARP_BUILDTYPE)
 	cd bindings/csharp/CNTKLibraryManagedDll/build/Linux/$(CSHARP_BUILDTYPE) && \
