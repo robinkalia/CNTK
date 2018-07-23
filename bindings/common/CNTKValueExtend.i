@@ -9,6 +9,21 @@
 //
 // Value
 //
+%ignore Dispose;
+%typemap(csdestruct, methodname="Dispose", methodmodifiers="public") CNTK::Value {
+    lock(this) {
+      if (swigCPtr.Handle != global::System.IntPtr.Zero) {
+        if (swigCMemOwnBase) {
+          swigCMemOwnBase = false;
+		  this.Erase();
+          $imcall;
+        }
+        swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
+      }
+      global::System.GC.SuppressFinalize(this);
+    }
+  }
+
 %extend CNTK::Value {
     // Instantiation template functions: dense input.
     static CNTK::ValuePtr CNTK::Value::CreateDenseFloat(const CNTK::NDShape& sampleShape, const std::vector<std::vector<float>>& sequences,
